@@ -1,12 +1,16 @@
 // js/common.js
 // ---------------------------------------------------
-// Funções utilitárias compartilhadas entre páginas.
-// - registro de logs (coleção "logs")
-// - formatação de datas
-// - cálculo de tempo de abertura
+// Funções utilitárias compartilhadas.
 // ---------------------------------------------------
 
-import { db, collection, addDoc, serverTimestamp } from "./firebase-config.js";
+import {
+  db,
+  collection,
+  addDoc,
+  serverTimestamp,
+  doc,
+  runTransaction
+} from "./firebase-config.js";
 
 /**
  * Cria um log na coleção "logs".
@@ -74,23 +78,24 @@ export function calcularTempoAbertura(ts) {
  *   CH-AAAA-XXXX (XXXX é contador na sessão)
  * Na prática, você poderia usar um contador global em outra coleção.
  */
-import { db, doc, runTransaction } from "./firebase-config.js";
-
+// Protocolo sequencial usando transaction no Firestore
 export async function gerarProtocolo() {
   const ano = new Date().getFullYear();
   const contadorRef = doc(db, "config", "contadorChamados");
 
   const novoNumero = await runTransaction(db, async (transaction) => {
     const contadorDoc = await transaction.get(contadorRef);
+
     if (!contadorDoc.exists()) {
-      throw "Documento contadorChamados não encontrado!";
+      // Se o doc não existir, cria com valor 1
+      transaction.set(contadorRef, { valor: 1 });
+      return 1;
     }
 
-    let valorAtual = contadorDoc.data().valor || 0;
-    let novoValor = valorAtual + 1;
+    const valorAtual = contadorDoc.data().valor || 0;
+    const novoValor = valorAtual + 1;
 
     transaction.update(contadorRef, { valor: novoValor });
-
     return novoValor;
   });
 
@@ -137,4 +142,5 @@ export function converterArquivoParaBase64(file) {
     reader.readAsDataURL(file);
   });
 }
+
 
