@@ -74,12 +74,30 @@ export function calcularTempoAbertura(ts) {
  *   CH-AAAA-XXXX (XXXX é contador na sessão)
  * Na prática, você poderia usar um contador global em outra coleção.
  */
-let contadorProtocoloLocal = 1;
-export function gerarProtocolo() {
+import { db, doc, runTransaction } from "./firebase-config.js";
+
+export async function gerarProtocolo() {
   const ano = new Date().getFullYear();
-  const sequencial = String(contadorProtocoloLocal++).padStart(4, "0");
+  const contadorRef = doc(db, "config", "contadorChamados");
+
+  const novoNumero = await runTransaction(db, async (transaction) => {
+    const contadorDoc = await transaction.get(contadorRef);
+    if (!contadorDoc.exists()) {
+      throw "Documento contadorChamados não encontrado!";
+    }
+
+    let valorAtual = contadorDoc.data().valor || 0;
+    let novoValor = valorAtual + 1;
+
+    transaction.update(contadorRef, { valor: novoValor });
+
+    return novoValor;
+  });
+
+  const sequencial = String(novoNumero).padStart(4, "0");
   return `CH-${ano}-${sequencial}`;
 }
+
 
 /**
  * Define classe CSS de status para o elemento (pill).
@@ -119,3 +137,4 @@ export function converterArquivoParaBase64(file) {
     reader.readAsDataURL(file);
   });
 }
+
