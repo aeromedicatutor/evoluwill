@@ -18,9 +18,9 @@ import {
   doc,
   updateDoc,
   deleteDoc,
-  serverTimestamp
+  serverTimestamp,
+  runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
 // TODO: Substitua pelos dados do seu projeto Firebase.
 const firebaseConfig = {
   apiKey: "AIzaSyCA5MFTCh-QsaQAnC-ZzVhQF1jCg_8TUfY",
@@ -53,3 +53,4 @@ export {
   deleteDoc,
   serverTimestamp
 };
+
