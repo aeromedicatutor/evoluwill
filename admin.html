@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Painel de Chamados - Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="page-light">
+  <header class="app-header">
+    <div class="app-header-inner">
+      <div class="logo">Evoluwill</div>
+      <nav class="top-nav">
+        <a href="admin.html" class="nav-link active">Painel ADM</a>
+        <a href="relatorios.html" class="nav-link">Relatórios</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-container admin-layout">
+    <!-- Coluna de Chamados -->
+    <section class="column">
+      <header class="section-header">
+        <h1>Painel de Chamados</h1>
+        <div class="section-actions">
+          <span class="badge" id="totalChamadosBadge">0 chamados</span>
+        </div>
+      </header>
+
+      <div class="filter-bar">
+        <select id="statusFiltro" class="input-pill">
+          <option value="TODOS">Todos os status</option>
+          <option value="Em Espera">Em Espera</option>
+          <option value="Em atendimento">Em atendimento</option>
+          <option value="Resolvido">Resolvido</option>
+          <option value="Cancelado">Cancelado</option>
+        </select>
+
+        <input type="text" id="buscaTexto" class="input-pill" placeholder="Buscar por nome ou assunto" />
+      </div>
+
+      <div id="chamadosContainer" class="cards-grid">
+        <!-- Cards de chamados serão inseridos via JS -->
+      </div>
+    </section>
+
+    <!-- Coluna de Logs -->
+    <section class="column logs-column">
+      <header class="section-header">
+        <h2>Logs do Sistema</h2>
+      </header>
+
+      <div class="filter-bar">
+        <input type="datetime-local" id="logDataInicio" class="input-pill" />
+        <input type="datetime-local" id="logDataFim" class="input-pill" />
+        <button id="filtrarLogsBtn" class="btn btn-secondary btn-small">Filtrar</button>
+      </div>
+
+      <div class="logs-table-wrapper">
+        <table class="logs-table">
+          <thead>
+          <tr>
+            <th>Data/Hora</th>
+            <th>Ação</th>
+            <th>ID Chamado</th>
+            <th>Ator</th>
+            <th>Detalhes</th>
+          </tr>
+          </thead>
+          <tbody id="logsTableBody">
+          <!-- Linhas via JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal de detalhes do chamado -->
+  <div id="detalheChamadoModal" class="modal-overlay hidden">
+    <div class="modal modal-large">
+      <header class="modal-header">
+        <span class="pill pill-primary" id="modalProtocolo">CH-0000</span>
+        <button class="modal-close-btn" id="detalheFecharBtn">×</button>
+      </header>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="field-row">
+              <span class="field-label">Data de abertura</span>
+              <span class="field-value" id="modalDataAbertura"></span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Tempo de abertura</span>
+              <span class="field-value" id="modalTempoAbertura"></span>
+            </div>
+          </div>
+
+          <div>
+            <div class="field-row">
+              <span class="field-label">Status</span>
+              <select id="modalStatus" class="input-pill">
+                <option value="Em Espera">Em Espera</option>
+                <option value="Em atendimento">Em atendimento</option>
+                <option value="Resolvido">Resolvido</option>
+                <option value="Cancelado">Cancelado</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-grid">
+          <div>
+            <div class="field-row">
+              <span class="field-label">Nome do solicitante</span>
+              <input id="modalNome" class="input-underline" />
+            </div>
+          </div>
+          <div>
+            <div class="field-row">
+              <span class="field-label">Telefone</span>
+              <input id="modalTelefone" class="input-underline" />
+            </div>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <span class="field-label">Assunto</span>
+          <input id="modalAssunto" class="input-underline" />
+        </div>
+
+        <div class="field-row">
+          <span class="field-label">Descrição</span>
+          <textarea id="modalDescricao" rows="4"></textarea>
+        </div>
+
+        <div class="field-row">
+          <span class="field-label">Anexo</span>
+          <div id="modalAnexoContainer" class="attachment-box">
+            <!-- Preenchido via JS -->
+          </div>
+        </div>
+      </div>
+
+      <footer class="modal-footer">
+        <button id="modalExcluirBtn" class="btn btn-danger">Excluir</button>
+        <button id="modalSalvarBtn" class="btn btn-primary">Salvar alterações</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal de confirmação de exclusão -->
+  <div id="confirmDeleteModal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-icon">🗑️</div>
+      <h3>Excluir chamado</h3>
+      <p>Tem certeza que deseja excluir este chamado? Esta ação não poderá ser desfeita.</p>
+      <div class="modal-footer">
+        <button id="confirmDeleteCancelBtn" class="btn btn-secondary">Não, cancelar</button>
+        <button id="confirmDeleteOkBtn" class="btn btn-danger">Sim, excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de alerta simples -->
+  <div id="adminAlertModal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-icon">⚠️</div>
+      <h3 id="adminAlertTitle">Erro</h3>
+      <p id="adminAlertMessage"></p>
+      <button id="adminAlertCloseBtn" class="btn btn-secondary">Fechar</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Acompanhar Chamado</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="page-light">
+<header class="app-header">
+  <div class="app-header-inner">
+    <div class="logo">Evoluwill</div>
+    <nav class="top-nav">
+      <a href="index.html" class="nav-link">Abrir Chamado</a>
+      <a href="acompanhamento.html" class="nav-link active">Acompanhar Chamado</a>
+    </nav>
+  </div>
+</header>
+
+<main class="main-container">
+  <section class="hero-section">
+    <div class="hero-text">
+      <h1>Acompanhe seu chamado</h1>
+      <p>Digite o número do protocolo para ver o status.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="search-row">
+      <input type="text" id="protocoloInput" class="input-pill" placeholder="Ex: CH-2025-0001" />
+      <button id="buscarChamadoBtn" class="btn btn-primary btn-medium">Buscar</button>
+    </div>
+
+    <div id="acompanhamentoResultado" class="cards-grid">
+      <!-- Card do chamado encontrado será inserido aqui -->
+    </div>
+  </section>
+</main>
+
+<!-- Modal de detalhes de acompanhamento (somente leitura) -->
+<div id="acompanharModal" class="modal-overlay hidden">
+  <div class="modal modal-large">
+    <header class="modal-header">
+      <span class="pill pill-primary" id="acompModalProtocolo">CH-0000</span>
+      <button class="modal-close-btn" id="acompanharFecharBtn">×</button>
+    </header>
+
+    <div class="modal-body">
+      <div class="modal-grid">
+        <div>
+          <div class="field-row">
+            <span class="field-label">Data de abertura</span>
+            <span class="field-value" id="acompanharDataAbertura"></span>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Tempo de abertura</span>
+            <span class="field-value" id="acompanharTempoAbertura"></span>
+          </div>
+        </div>
+
+        <div>
+          <div class="field-row">
+            <span class="field-label">Status</span>
+            <span class="status-pill" id="acompanharStatus"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-grid">
+        <div class="field-row">
+          <span class="field-label">Nome do solicitante</span>
+          <span class="field-value" id="acompanharNome"></span>
+        </div>
+        <div class="field-row">
+          <span class="field-label">Telefone</span>
+          <span class="field-value" id="acompanharTelefone"></span>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <span class="field-label">Assunto</span>
+        <span class="field-value" id="acompanharAssunto"></span>
+      </div>
+
+      <div class="field-row">
+        <span class="field-label">Descrição</span>
+        <div class="field-value multiline" id="acompanharDescricao"></div>
+      </div>
+
+      <div class="field-row">
+        <span class="field-label">Anexo</span>
+        <div id="acompanharAnexoContainer" class="attachment-box"></div>
+      </div>
+    </div>
+
+    <footer class="modal-footer">
+      <!-- Usuário apenas cancela o chamado, não exclui -->
+      <button id="cancelarChamadoBtn" class="btn btn-danger">Cancelar chamado</button>
+    </footer>
+  </div>
+</div>
+
+<!-- Modal simples para mensagens -->
+<div id="acompAlertModal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-icon">ℹ️</div>
+    <h3 id="acompAlertTitle">Mensagem</h3>
+    <p id="acompAlertMessage"></p>
+    <button id="acompAlertCloseBtn" class="btn btn-secondary">Fechar</button>
+  </div>
+</div>
+
+<script type="module" src="js/acompanhamento.js"></script>
+</body>
+</html>

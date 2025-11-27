@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Relatórios de Chamados - Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="page-light">
+<header class="app-header">
+  <div class="app-header-inner">
+    <div class="logo">Evoluwill</div>
+    <nav class="top-nav">
+      <a href="admin.html" class="nav-link">Painel ADM</a>
+      <a href="relatorios.html" class="nav-link active">Relatórios</a>
+    </nav>
+  </div>
+</header>
+
+<main class="main-container">
+  <section class="card">
+    <header class="section-header">
+      <h1>Relatórios de Chamados</h1>
+    </header>
+
+    <div class="filter-bar wrap">
+      <div class="filter-group">
+        <label class="filter-label">Período</label>
+        <input type="date" id="relDataInicio" class="input-pill" />
+        <input type="date" id="relDataFim" class="input-pill" />
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Status</label>
+        <select id="relStatus" class="input-pill">
+          <option value="TODOS">Todos</option>
+          <option value="Em Espera">Em Espera</option>
+          <option value="Em atendimento">Em atendimento</option>
+          <option value="Resolvido">Resolvido</option>
+          <option value="Cancelado">Cancelado</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Nome / Assunto</label>
+        <input type="text" id="relTexto" class="input-pill" placeholder="Filtrar por nome ou assunto" />
+      </div>
+
+      <button id="aplicarFiltrosBtn" class="btn btn-primary btn-medium">Aplicar filtros</button>
+    </div>
+
+    <section class="summary-row" id="resumoRelatorios">
+      <!-- Resumos (totais) preenchidos via JS -->
+    </section>
+
+    <div class="table-wrapper">
+      <table class="logs-table">
+        <thead>
+        <tr>
+          <th>Protocolo</th>
+          <th>Data Abertura</th>
+          <th>Status</th>
+          <th>Nome</th>
+          <th>Assunto</th>
+        </tr>
+        </thead>
+        <tbody id="relTabelaBody">
+        <!-- Linhas via JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="relatorio-actions">
+      <button id="gerarCsvBtn" class="btn btn-secondary">Gerar planilha CSV</button>
+    </div>
+  </section>
+</main>
+
+<!-- Modal simples para mensagens -->
+<div id="relAlertModal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-icon">ℹ️</div>
+    <h3 id="relAlertTitle">Mensagem</h3>
+    <p id="relAlertMessage"></p>
+    <button id="relAlertCloseBtn" class="btn btn-secondary">Fechar</button>
+  </div>
+</div>
+
+<script type="module" src="js/relatorios.js"></script>
+</body>
+</html>
