@@ -51,6 +51,8 @@ export {
   doc,
   updateDoc,
   deleteDoc,
-  serverTimestamp
+  serverTimestamp,
+  runTransaction
 };
+
 
