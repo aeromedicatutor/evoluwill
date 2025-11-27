@@ -74,7 +74,7 @@ form?.addEventListener("submit", async (e) => {
     return;
   }
 
-  const protocolo = gerarProtocolo();
+  const protocolo = await gerarProtocolo();
   const createdAt = serverTimestamp();
   const status = "Em Espera";
 
@@ -175,3 +175,4 @@ function mostrarAlertaSimples(titulo, mensagem) {
   simpleAlertMessage.textContent = mensagem;
   abrirModal(simpleAlertModal);
 }
+
