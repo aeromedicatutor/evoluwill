@@ -1,11 +1,13 @@
 // js/admin.js
 // ---------------------------------------------------
-// Lida com:
-//  - Listagem em tempo real dos chamados (cards)
-//  - Filtros (status + texto)
-//  - Modal de detalhes com edição e update de status
-//  - Exclusão de chamado com confirmação
-//  - Leitura de logs (tabela + filtros por data/hora)
+// Painel do Administrador
+// - Listagem em tempo real dos chamados (cards)
+// - Filtros (status + texto + nome)
+// - Modal de detalhes com edição e update de status
+// - Exclusão de chamado com confirmação
+// - Logs (tabela + filtros de data/hora)
+// - Chat de comentários dentro do modal (ADM <-> Usuário)
+// - Comentário automático em mudança de status
 // ---------------------------------------------------
 
 import {
@@ -14,14 +16,15 @@ import {
   onSnapshot,
   query,
   orderBy,
+  where,
   doc,
   updateDoc,
   deleteDoc,
-  getDocs,
-  where
+  getDocs
 } from "./firebase-config.js";
 import {
   criarLog,
+  criarComentario,
   calcularTempoAbertura,
   formatarDataHora,
   aplicarClasseStatus
@@ -30,8 +33,10 @@ import {
 // ELEMENTOS PRINCIPAIS
 const containerChamados = document.getElementById("chamadosContainer");
 const totalChamadosBadge = document.getElementById("totalChamadosBadge");
+const contagemNomeBadge = document.getElementById("contagemNomeBadge");
 const statusFiltroSelect = document.getElementById("statusFiltro");
 const buscaTextoInput = document.getElementById("buscaTexto");
+const filtroNomeInput = document.getElementById("filtroNome");
 
 // Modal detalhes
 const detalheModal = document.getElementById("detalheChamadoModal");
@@ -47,6 +52,11 @@ const modalDescricaoTextarea = document.getElementById("modalDescricao");
 const modalAnexoContainer = document.getElementById("modalAnexoContainer");
 const modalSalvarBtn = document.getElementById("modalSalvarBtn");
 const modalExcluirBtn = document.getElementById("modalExcluirBtn");
+
+// Chat / comentários no modal ADM
+const adminCommentsList = document.getElementById("adminCommentsList");
+const adminNewCommentTextarea = document.getElementById("adminNewComment");
+const adminSendCommentBtn = document.getElementById("adminSendCommentBtn");
 
 // Modal confirmação de exclusão
 const confirmDeleteModal = document.getElementById("confirmDeleteModal");
@@ -68,6 +78,10 @@ const filtrarLogsBtn = document.getElementById("filtrarLogsBtn");
 // Estado em memória
 let listaChamados = [];
 let chamadoSelecionado = null;
+let aguardandoConfirmacaoDelete = false;
+
+// Listener de comentários no modal
+let unsubscribeComentariosAdm = null;
 
 // -----------------------
 // LISTAGEM EM TEMPO REAL
@@ -78,9 +92,9 @@ const qChamados = query(chamadosRef, orderBy("createdAt", "desc"));
 onSnapshot(
   qChamados,
   (snapshot) => {
-    listaChamados = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data()
+    listaChamados = snapshot.docs.map((docSnap) => ({
+      id: docSnap.id,
+      ...docSnap.data()
     }));
 
     console.log("Snapshot de chamados recebido. Total:", listaChamados.length);
@@ -92,24 +106,52 @@ onSnapshot(
   }
 );
 
-// Renderiza cards considerando filtros
+// -----------------------
+// RENDERIZAÇÃO DOS CARDS
+// -----------------------
 function renderizarChamados() {
-  const statusFiltro = statusFiltroSelect.value;
-  const texto = buscaTextoInput.value.trim().toLowerCase();
+  const statusFiltro = statusFiltroSelect?.value || "TODOS";
+  const texto = buscaTextoInput?.value.trim().toLowerCase() || "";
+  const nomeFiltro = filtroNomeInput?.value.trim().toLowerCase() || "";
 
   containerChamados.innerHTML = "";
 
+  // Contagem por nome (independente de status)
+  if (nomeFiltro) {
+    const qtdPorNome = listaChamados.filter((c) =>
+      (c.nome || "").toLowerCase().includes(nomeFiltro)
+    ).length;
+
+    if (contagemNomeBadge) {
+      contagemNomeBadge.style.display = "inline-flex";
+      contagemNomeBadge.textContent =
+        `${qtdPorNome} chamado${qtdPorNome === 1 ? "" : "s"} para "${filtroNomeInput.value}"`;
+    }
+  } else if (contagemNomeBadge) {
+    contagemNomeBadge.style.display = "none";
+    contagemNomeBadge.textContent = "";
+  }
+
   const filtrados = listaChamados.filter((c) => {
+    // Não mostrar arquivados na lista principal (se usar esse campo)
+    if (c.arquivado) return false;
+
     const statusOk = statusFiltro === "TODOS" || c.status === statusFiltro;
     const textoOk =
       !texto ||
       (c.nome && c.nome.toLowerCase().includes(texto)) ||
       (c.assunto && c.assunto.toLowerCase().includes(texto));
+    const nomeOk =
+      !nomeFiltro ||
+      (c.nome && c.nome.toLowerCase().includes(nomeFiltro));
 
-    return statusOk && textoOk;
+    return statusOk && textoOk && nomeOk;
   });
 
-  totalChamadosBadge.textContent = `${filtrados.length} chamado${filtrados.length === 1 ? "" : "s"}`;
+  if (totalChamadosBadge) {
+    totalChamadosBadge.textContent =
+      `${filtrados.length} chamado${filtrados.length === 1 ? "" : "s"}`;
+  }
 
   if (filtrados.length === 0) {
     containerChamados.innerHTML =
@@ -163,11 +205,9 @@ function renderizarChamados() {
   });
 }
 
-// Filtros
 statusFiltroSelect?.addEventListener("change", renderizarChamados);
-buscaTextoInput?.addEventListener("input", () => {
-  renderizarChamados();
-});
+buscaTextoInput?.addEventListener("input", renderizarChamados);
+filtroNomeInput?.addEventListener("input", renderizarChamados);
 
 // -----------------------
 // MODAL DETALHE (CRUD)
@@ -195,6 +235,9 @@ function abrirModalDetalhe(chamado) {
     modalAnexoContainer.textContent = "Nenhum anexo.";
   }
 
+  // Inicia/renova chat de comentários para este chamado
+  iniciarChatAdm(chamado);
+
   abrirModal(detalheModal);
 }
 
@@ -203,7 +246,9 @@ detalheModal?.addEventListener("click", (e) => {
   if (e.target === detalheModal) fecharModal(detalheModal);
 });
 
-// Salvar alterações (UPDATE)
+// -----------------------
+// SALVAR ALTERAÇÕES
+// -----------------------
 modalSalvarBtn?.addEventListener("click", async () => {
   if (!chamadoSelecionado) return;
 
@@ -212,6 +257,8 @@ modalSalvarBtn?.addEventListener("click", async () => {
   const novoTelefone = modalTelefoneInput.value.trim();
   const novoAssunto = modalAssuntoInput.value.trim();
   const novaDescricao = modalDescricaoTextarea.value.trim();
+
+  const statusAnterior = chamadoSelecionado.status || "";
 
   try {
     const docRef = doc(db, "chamados", chamadoSelecionado.id);
@@ -226,19 +273,57 @@ modalSalvarBtn?.addEventListener("click", async () => {
 
     console.log("Chamado atualizado:", chamadoSelecionado.protocolo);
 
-    await criarLog({
-      type: "UPDATE_CHAMADO",
-      chamadoId: chamadoSelecionado.protocolo,
-      actorType: "ADM",
-      details: `Chamado atualizado pelo ADM. Novo status: "${novoStatus}".`
-    });
+    const promises = [];
+
+    // Comentário automático de mudança de status
+    if (statusAnterior !== novoStatus) {
+      const msgStatus = `Status alterado de "${statusAnterior || "-"}" para "${novoStatus}".`;
+
+      promises.push(
+        criarComentario({
+          chamadoFirestoreId: chamadoSelecionado.id,
+          protocolo: chamadoSelecionado.protocolo,
+          actorType: "ADM",
+          mensagem: msgStatus,
+          origem: "STATUS_CHANGE"
+        })
+      );
+
+      promises.push(
+        criarLog({
+          type: "UPDATE_STATUS",
+          chamadoId: chamadoSelecionado.protocolo,
+          actorType: "ADM",
+          details: msgStatus
+        })
+      );
+    }
+
+    // Log genérico de update
+    promises.push(
+      criarLog({
+        type: "UPDATE_CHAMADO",
+        chamadoId: chamadoSelecionado.protocolo,
+        actorType: "ADM",
+        details: `Chamado atualizado pelo ADM. Novo status: "${novoStatus}".`
+      })
+    );
+
+    await Promise.all(promises);
+
+    // Atualiza estado em memória até o próximo snapshot
+    chamadoSelecionado.status = novoStatus;
+    chamadoSelecionado.nome = novoNome;
+    chamadoSelecionado.telefone = novoTelefone;
+    chamadoSelecionado.assunto = novoAssunto;
+    chamadoSelecionado.descricao = novaDescricao;
 
     fecharModal(detalheModal);
   } catch (err) {
     console.error("Erro ao atualizar chamado:", err);
     await criarLog({
       type: "ERROR_UPDATE_CHAMADO",
-      chamadoId: chamadoSelecionado.protocolo,
+      chamadoId: chamadoSelecionado?.protocolo || null,
       actorType: "ADM",
       details: `Erro ao atualizar chamado: ${err.message}`
     });
@@ -246,9 +331,147 @@ modalSalvarBtn?.addEventListener("click", async () => {
   }
 });
 
-// Exclusão com confirmação (DELETE)
-let aguardandoConfirmacaoDelete = false;
+// -----------------------
+// CHAT / COMENTÁRIOS (ADM)
+// -----------------------
+function iniciarChatAdm(chamado) {
+  if (!adminCommentsList) return;
 
+  if (unsubscribeComentariosAdm) {
+    unsubscribeComentariosAdm();
+    unsubscribeComentariosAdm = null;
+  }
+
+  adminCommentsList.innerHTML =
+    '<p class="small muted">Carregando mensagens...</p>';
+
+  const comentariosRef = collection(db, "comentarios");
+
+  // Sem orderBy na query (não precisa de índice composto)
+  const q = query(
+    comentariosRef,
+    where("chamadoId", "==", chamado.id)
+  );
+
+  unsubscribeComentariosAdm = onSnapshot(
+    q,
+    (snapshot) => {
+      let comentarios = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+
+      // Ordena no cliente por createdAt
+      comentarios = comentarios.sort((a, b) => {
+        const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+        const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+        return ta - tb;
+      });
+
+      renderComentariosAdm(comentarios);
+    },
+    (error) => {
+      console.error("Erro ao ouvir comentários (ADM):", error);
+      adminCommentsList.innerHTML =
+        '<p class="small muted">Não foi possível carregar as mensagens.</p>';
+    }
+  );
+}
+
+
+function renderComentariosAdm(lista) {
+  adminCommentsList.innerHTML = "";
+
+  if (!lista || lista.length === 0) {
+    adminCommentsList.innerHTML =
+      '<p class="small muted">Nenhuma mensagem ainda. Use o campo abaixo para falar com o usuário.</p>';
+    return;
+  }
+
+  lista.forEach((c) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "comment-wrapper";
+
+    const bubble = document.createElement("div");
+    bubble.className = "comment-bubble";
+
+    const isAdm = c.autorTipo === "ADM";
+    const isUsuario = c.autorTipo === "USUARIO";
+
+    if (isAdm) {
+      bubble.classList.add("comment-admin");
+    } else if (isUsuario) {
+      bubble.classList.add("comment-user");
+    }
+
+    const meta = document.createElement("div");
+    meta.className = "comment-meta";
+    const quem = isAdm ? "Você (ADM)" : "Usuário";
+    meta.textContent = `${quem} • ${formatarDataHora(c.createdAt)}`;
+
+    const texto = document.createElement("div");
+    texto.className = "comment-text";
+    texto.textContent = c.mensagem || "";
+
+    bubble.appendChild(meta);
+    bubble.appendChild(texto);
+    wrapper.appendChild(bubble);
+
+    adminCommentsList.appendChild(wrapper);
+  });
+
+  adminCommentsList.scrollTop = adminCommentsList.scrollHeight;
+}
+
+async function enviarComentarioAdm() {
+  if (!chamadoSelecionado) {
+    mostrarAdminAlert("Nenhum chamado", "Abra um chamado antes de comentar.");
+    return;
+  }
+
+  const texto = adminNewCommentTextarea.value.trim();
+  if (!texto) return;
+
+  try {
+    await criarComentario({
+      chamadoFirestoreId: chamadoSelecionado.id,
+      protocolo: chamadoSelecionado.protocolo,
+      actorType: "ADM",
+      mensagem: texto,
+      origem: "CHAT_ADM"
+    });
+
+    await criarLog({
+      type: "CREATE_COMENTARIO_ADM",
+      chamadoId: chamadoSelecionado.protocolo,
+      actorType: "ADM",
+      details: "ADM adicionou um novo comentário no chamado."
+    });
+
+    adminNewCommentTextarea.value = "";
+  } catch (err) {
+    console.error("Erro ao enviar comentário do ADM:", err);
+    mostrarAdminAlert(
+      "Erro ao enviar mensagem",
+      "Não foi possível enviar seu comentário. Tente novamente."
+    );
+  }
+}
+
+adminSendCommentBtn?.addEventListener("click", () => {
+  enviarComentarioAdm();
+});
+
+adminNewCommentTextarea?.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    enviarComentarioAdm();
+  }
+});
+
+// -----------------------
+// EXCLUSÃO COM CONFIRMAÇÃO
+// -----------------------
 modalExcluirBtn?.addEventListener("click", () => {
   if (!chamadoSelecionado) return;
   aguardandoConfirmacaoDelete = true;
@@ -299,16 +522,14 @@ async function carregarLogs() {
   logsTableBody.innerHTML = "<tr><td colspan='5'>Carregando...</td></tr>";
 
   const logsRef = collection(db, "logs");
-  // Vamos aplicar filtros por data/hora apenas por Firestore.
-  // Se o usuário não preencher, buscamos tudo e filtramos no cliente.
-  let q = query(logsRef, orderBy("createdAt", "desc"));
+  const q = query(logsRef, orderBy("createdAt", "desc"));
 
   try {
     const snapshot = await getDocs(q);
 
-    let logs = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data()
+    let logs = snapshot.docs.map((docSnap) => ({
+      id: docSnap.id,
+      ...docSnap.data()
     }));
 
     const inicio = logDataInicioInput.value ? new Date(logDataInicioInput.value) : null;

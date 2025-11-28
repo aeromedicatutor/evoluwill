@@ -39,6 +39,54 @@ export async function criarLog({ type, chamadoId = null, actorType, details }) {
 }
 
 /**
+ * Cria um comentário na coleção "comentarios".
+ * Usado para:
+ *  - Registrar mudança de status
+ *  - Mensagens ADM/Usuário
+ *  - Motivos de finalização/cancelamento
+ *
+ * Estrutura sugerida da collection "comentarios":
+ *  - chamadoId: ID do doc na coleção "chamados"
+ *  - protocolo: protocolo legível (CH-AAAA-XXXX)
+ *  - autorTipo: "ADM" | "USUARIO"
+ *  - origem: string curta ("STATUS_CHANGE", "CANCELAMENTO_USUARIO", etc.)
+ *  - mensagem: texto do comentário
+ *  - createdAt: serverTimestamp()
+ *  - lidoPeloUsuario: bool (false quando ADM comenta algo novo)
+ *  - lidoPeloAdm: bool (false quando USUARIO comenta algo novo)
+ */
+export async function criarComentario({
+  chamadoFirestoreId,
+  protocolo,
+  actorType,
+  mensagem,
+  origem = "MANUAL"
+}) {
+  if (!chamadoFirestoreId || !mensagem) return;
+
+  const isAdm = actorType === "ADM";
+
+  const comentario = {
+    chamadoId: chamadoFirestoreId,
+    protocolo: protocolo || null,
+    autorTipo: actorType,
+    origem,
+    mensagem,
+    createdAt: serverTimestamp(),
+    lidoPeloUsuario: isAdm ? false : true,
+    lidoPeloAdm: isAdm ? true : false
+  };
+
+  console.log("[COMENTARIO]", comentario);
+
+  try {
+    await addDoc(collection(db, "comentarios"), comentario);
+  } catch (err) {
+    console.error("Erro ao salvar comentário no Firestore:", err);
+  }
+}
+
+/**
  * Converte um Firestore Timestamp ou Date para string dd/mm/aaaa hh:mm
  */
 export function formatarDataHora(ts) {
@@ -75,28 +123,58 @@ export function calcularTempoAbertura(ts) {
 
 /**
  * Gera um ID de protocolo legível:
- *   CH-AAAA-XXXX (XXXX é contador na sessão)
- * Na prática, você poderia usar um contador global em outra coleção.
+ *   CH-AAAA-XXXX
+ *
+ * Compatível com o contador antigo:
+ *  - Se existir config/contadorChamados-AAAA → usa esse (novo padrão por ano)
+ *  - Se NÃO existir, tenta ler config/contadorChamados (padrão antigo)
+ *      - Se existir, começa a partir dele (valor+1) e grava no doc novo do ano
+ *      - Se não existir nada, começa em 1
  */
-// Protocolo sequencial usando transaction no Firestore
 export async function gerarProtocolo() {
   const ano = new Date().getFullYear();
-  const contadorRef = doc(db, "config", "contadorChamados");
+  const docIdAno = `contadorChamados-${ano}`;
+
+  const contadorAnoRef = doc(db, "config", docIdAno);
+  const contadorAntigoRef = doc(db, "config", "contadorChamados");
 
   const novoNumero = await runTransaction(db, async (transaction) => {
-    const contadorDoc = await transaction.get(contadorRef);
+    const contadorAnoDoc = await transaction.get(contadorAnoRef);
 
-    if (!contadorDoc.exists()) {
-      // Se o doc não existir, cria com valor 1
-      transaction.set(contadorRef, { valor: 1 });
-      return 1;
+    // Caso 1: já existe contador do ano atual → segue a vida
+    if (contadorAnoDoc.exists()) {
+      const data = contadorAnoDoc.data() || {};
+      const valorAtual = data.valor || 0;
+      const novoValor = valorAtual + 1;
+
+      transaction.update(contadorAnoRef, {
+        ano,
+        valor: novoValor
+      });
+      return novoValor;
     }
 
-    const valorAtual = contadorDoc.data().valor || 0;
-    const novoValor = valorAtual + 1;
+    // Caso 2: ainda não existe contador do ano atual
+    // Tentamos reaproveitar o contador antigo (sem ano) se existir
+    const contadorAntigoDoc = await transaction.get(contadorAntigoRef);
 
-    transaction.update(contadorRef, { valor: novoValor });
-    return novoValor;
+    if (contadorAntigoDoc.exists()) {
+      const dataAntiga = contadorAntigoDoc.data() || {};
+      const valorAntigo = dataAntiga.valor || 0;
+      const novoValor = valorAntigo + 1;
+
+      // Criamos o doc do ano atual já começando do último valor antigo + 1
+      transaction.set(contadorAnoRef, { ano, valor: novoValor });
+
+      // Opcional: também atualiza o contador antigo para não voltar pra trás
+      transaction.update(contadorAntigoRef, { valor: novoValor });
+
+      return novoValor;
+    }
+
+    // Caso 3: não existe nem contador antigo nem do ano → primeiro chamado de todos
+    transaction.set(contadorAnoRef, { ano, valor: 1 });
+    return 1;
   });
 
   const sequencial = String(novoNumero).padStart(4, "0");
@@ -115,12 +193,14 @@ export function aplicarClasseStatus(element, status) {
   if (!status) return;
 
   const classSuffix = status
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove acentos, se tiver
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // remove acentos
     .toLowerCase()
     .replace(/\s+/g, "-"); // troca espaços por "-"
 
   element.classList.add(`status-${classSuffix}`);
 }
+
 /**
  * Limite de tamanho para o anexo em bytes (~700KB).
  */
@@ -142,5 +222,3 @@ export function converterArquivoParaBase64(file) {
     reader.readAsDataURL(file);
   });
 }
-
-

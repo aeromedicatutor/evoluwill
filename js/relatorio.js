@@ -55,13 +55,13 @@ async function carregarChamados() {
   const chamadosRef = collection(db, "chamados");
   const q = query(chamadosRef, orderBy("createdAt", "desc"));
 
-  console.log("Carregando chamados para relatórios...");
+  console.log("Carregando chamados para relatórios.");
 
   try {
     const snapshot = await getDocs(q);
-    todosChamados = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data()
+    todosChamados = snapshot.docs.map((docSnap) => ({
+      id: docSnap.id,
+      ...docSnap.data()
     }));
 
     console.log(`Total de chamados carregados: ${todosChamados.length}`);
@@ -91,7 +91,6 @@ carregarChamados();
 // -----------------------
 // APLICAÇÃO DE FILTROS
 // -----------------------
-
 aplicarFiltrosBtn?.addEventListener("click", () => {
   aplicarFiltros();
 });
@@ -184,7 +183,6 @@ async function aplicarFiltros() {
 // -----------------------
 // RENDERIZAÇÃO DE RESUMO
 // -----------------------
-
 function renderizarResumo() {
   resumoRelatoriosSection.innerHTML = "";
 
@@ -233,7 +231,6 @@ function renderizarResumo() {
 // -----------------------
 // RENDERIZAÇÃO DA TABELA
 // -----------------------
-
 function renderizarTabela() {
   relTabelaBody.innerHTML = "";
 
@@ -277,7 +274,6 @@ function renderizarTabela() {
 // -----------------------
 // GERAÇÃO DO CSV
 // -----------------------
-
 gerarCsvBtn?.addEventListener("click", async () => {
   if (!chamadosFiltrados || chamadosFiltrados.length === 0) {
     mostrarRelAlert(
@@ -364,12 +360,6 @@ function gerarCsv(lista) {
 
 /**
  * Faz o download do CSV gerado usando Blob + URL.createObjectURL.
- * Essa abordagem:
- *  - Cria um Blob em memória com o conteúdo do CSV
- *  - Gera uma URL temporária com URL.createObjectURL(blob)
- *  - Cria um <a download="..."> apontando para essa URL
- *  - Dispara o click programaticamente
- *  - Remove o link e revoga a URL após o download
  */
 function downloadCsv(csvString) {
   const blob = new Blob([csvString], {
@@ -392,7 +382,6 @@ function downloadCsv(csvString) {
 // -----------------------
 // HELPERS DE MODAL/ALERTA
 // -----------------------
-
 function mostrarRelAlert(titulo, mensagem) {
   relAlertTitle.textContent = titulo;
   relAlertMessage.textContent = mensagem;

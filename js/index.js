@@ -23,6 +23,8 @@ import {
 const form = document.getElementById("chamadoForm");
 const anexoInput = document.getElementById("anexo");
 const anexoNomeSpan = document.getElementById("anexoNome");
+// NOVO: botão estilizado e nome clicável
+const anexoLabel = document.querySelector(".file-label");
 
 const feedbackModal = document.getElementById("feedbackModal");
 const feedbackIcon = document.getElementById("feedbackIcon");
@@ -37,6 +39,20 @@ const simpleAlertMessage = document.getElementById("simpleAlertMessage");
 const simpleAlertCloseBtn = document.getElementById("simpleAlertCloseBtn");
 
 let arquivoSelecionado = null;
+
+// -----------------------
+// INPUT DE ANEXO
+// -----------------------
+
+// Deixa o botão estilizado realmente abrindo o seletor de arquivo
+anexoLabel?.addEventListener("click", () => {
+  anexoInput?.click();
+});
+
+// Também permite clicar no texto do nome do arquivo
+anexoNomeSpan?.addEventListener("click", () => {
+  anexoInput?.click();
+});
 
 // Mostra nome do arquivo no input estilizado
 anexoInput?.addEventListener("change", (e) => {
@@ -60,7 +76,9 @@ anexoInput?.addEventListener("change", (e) => {
   anexoNomeSpan.textContent = file.name;
 });
 
-// Envio do formulário
+// -----------------------
+// ENVIO DO FORMULÁRIO
+// -----------------------
 form?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -148,7 +166,9 @@ form?.addEventListener("submit", async (e) => {
   }
 });
 
-// Fechamento dos modais
+// -----------------------
+// MODAIS / ALERTAS
+// -----------------------
 feedbackCloseBtn?.addEventListener("click", () => fecharModal(feedbackModal));
 feedbackModal?.addEventListener("click", (e) => {
   if (e.target === feedbackModal) fecharModal(feedbackModal);
@@ -175,4 +195,3 @@ function mostrarAlertaSimples(titulo, mensagem) {
   simpleAlertMessage.textContent = mensagem;
   abrirModal(simpleAlertModal);
 }
-
