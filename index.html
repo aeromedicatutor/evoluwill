@@ -36,7 +36,7 @@
           <input type="text" id="nome" name="nome" required />
         </div>
 
-        <!-- NOVO: Categoria -->
+        <!-- CATEGORIA -->
         <div class="form-field">
           <label for="categoria">Categoria</label>
           <select id="categoria" name="categoria" required>
@@ -57,7 +57,7 @@
           <input type="text" id="assunto" name="assunto" required />
         </div>
 
-        <!-- NOVO: Urgência -->
+        <!-- URGÊNCIA -->
         <div class="form-field">
           <label for="urgencia">Urgência</label>
           <select id="urgencia" name="urgencia" required>
@@ -77,10 +77,10 @@
           <textarea id="descricao" name="descricao" rows="4" required></textarea>
         </div>
 
-        <!-- Estrategia de anexo:
-             - Convertemos o arquivo em base64 e salvamos no Firestore.
-             - Isso continua gratuito dentro das cotas padrão do plano free do Firebase.
-             - Para evitar uso exagerado, limitamos o tamanho do arquivo a ~700KB (checado no JS). -->
+        <!-- Anexo:
+             - Convertemos o arquivo em base64 e salvamos no Firestore (campo anexoBase64).
+             - Isso continua dentro da cota free do Firebase.
+             - Limitamos a ~700KB para evitar abuso. -->
         <div class="form-field full-width">
           <label for="anexo">Anexo (imagem ou PDF - máx. ~700KB)</label>
           <div class="file-input-wrapper">
@@ -108,10 +108,14 @@
     <div class="modal">
       <div class="modal-icon" id="feedbackIcon">✔️</div>
       <h3 id="feedbackTitle">Chamado enviado com sucesso!</h3>
+
+      <!-- MENSAGEM FIXA; SÓ O SPAN RECEBE O PROTOCOLO PELO JS -->
       <p id="feedbackMessage">
-        Seu protocolo é <strong id="feedbackProtocolo"></strong>.
+        Seu protocolo é
+        <strong><span id="feedbackProtocolo"></span></strong>.
         Guarde este número para acompanhar o chamado.
       </p>
+
       <button id="feedbackCloseBtn" class="btn btn-primary">OK</button>
     </div>
   </div>
