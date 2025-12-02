@@ -123,10 +123,16 @@ nomeInput?.addEventListener("keydown", (e) => {
  * Busca chamados por:
  *  - Protocolo (se informado), ou
  *  - Nome do solicitante (se protocolo vazio e nome preenchido)
+ *
+ * IMPORTANTE:
+ *  - Firestore é case-sensitive.
+ *  - Aqui não convertemos mais para lowerCase, então o usuário precisa
+ *    digitar o nome com a mesma capitalização usada na abertura do chamado
+ *    (ex: "Jonas" ≠ "jonas").
  */
 async function buscarChamados() {
   let protocolo = protocoloInput?.value.trim() || "";
-  const nome = nomeInput?.value.trim().toLowerCase() || "";
+  const nome = nomeInput?.value.trim() || ""; // <-- REMOVIDO .toLowerCase()
 
   if (!protocolo && !nome) {
     mostrarAcompAlert(
@@ -187,7 +193,7 @@ async function buscarChamados() {
       return;
     }
 
-    // 2) Não há protocolo → busca por nome
+    // 2) Não há protocolo → busca por nome (prefix search, case-sensitive)
     console.log("Buscando por nome:", nome);
     const qNome = query(
       chamadosRef,
