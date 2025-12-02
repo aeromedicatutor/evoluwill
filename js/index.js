@@ -1,11 +1,6 @@
 // js/index.js
 // ---------------------------------------------------
 // Lógica da página de abertura de chamado (usuário).
-// - Captura do formulário
-// - Conversão do anexo em base64
-// - Criação do documento na coleção "chamados"
-// - Exibição de modal de sucesso/erro
-// - Uso de loading global em operações assíncronas
 // ---------------------------------------------------
 
 import {
@@ -26,13 +21,12 @@ import {
 const form = document.getElementById("chamadoForm");
 const anexoInput = document.getElementById("anexo");
 const anexoNomeSpan = document.getElementById("anexoNome");
-// botão estilizado
 const anexoLabel = document.querySelector(".file-label");
 
 const feedbackModal = document.getElementById("feedbackModal");
 const feedbackIcon = document.getElementById("feedbackIcon");
 const feedbackTitle = document.getElementById("feedbackTitle");
-const feedbackMessage = document.getElementById("feedbackMessage");
+// agora o texto fica fixo no HTML
 const feedbackProtocoloSpan = document.getElementById("feedbackProtocolo");
 const feedbackCloseBtn = document.getElementById("feedbackCloseBtn");
 
@@ -47,17 +41,14 @@ let arquivoSelecionado = null;
 // INPUT DE ANEXO
 // -----------------------
 
-// Deixa o botão estilizado realmente abrindo o seletor de arquivo
 anexoLabel?.addEventListener("click", () => {
   anexoInput?.click();
 });
 
-// Também permite clicar no texto do nome do arquivo
 anexoNomeSpan?.addEventListener("click", () => {
   anexoInput?.click();
 });
 
-// Mostra nome do arquivo no input estilizado
 anexoInput?.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) {
@@ -103,10 +94,10 @@ function mostrarFeedbackSucesso(protocolo) {
   if (!feedbackModal) return;
   feedbackIcon.textContent = "✔️";
   feedbackTitle.textContent = "Chamado enviado com sucesso!";
-  feedbackMessage.innerHTML =
-    'Seu protocolo é <strong id="feedbackProtocolo"></strong>. ' +
-    "Guarde este número para acompanhar o chamado.";
+
+  // A mensagem já está fixa no HTML; aqui só preenche o span
   feedbackProtocoloSpan.textContent = protocolo;
+
   feedbackModal.classList.remove("hidden");
 }
 
@@ -117,8 +108,14 @@ function mostrarFeedbackErro(msg) {
   }
   feedbackIcon.textContent = "❌";
   feedbackTitle.textContent = "Erro ao enviar chamado";
-  feedbackMessage.textContent = msg;
-  feedbackProtocoloSpan.textContent = "";
+  feedbackProtocoloSpan.textContent = ""; // limpa o protocolo
+
+  // Usa o próprio p para mostrar o texto de erro simples
+  const feedbackMessage = document.getElementById("feedbackMessage");
+  if (feedbackMessage) {
+    feedbackMessage.textContent = msg;
+  }
+
   feedbackModal.classList.remove("hidden");
 }
 
@@ -153,14 +150,13 @@ form?.addEventListener("submit", async (e) => {
   try {
     mostrarLoading();
 
-    // Converte anexo se existir
     if (arquivoSelecionado) {
       anexoBase64 = await converterArquivoParaBase64(arquivoSelecionado);
       anexoNome = arquivoSelecionado.name;
       anexoTipo = arquivoSelecionado.type;
     }
 
-    // Gera protocolo legível
+    // Gera protocolo legível (CH-AAAA-XXXX)
     const protocolo = await gerarProtocolo();
 
     const chamado = {
@@ -172,6 +168,7 @@ form?.addEventListener("submit", async (e) => {
       protocolo,
       status: "Em Espera",
       createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
       anexoBase64: anexoBase64 || null,
       anexoNome: anexoNome || null,
       anexoTipo: anexoTipo || null
@@ -192,7 +189,6 @@ form?.addEventListener("submit", async (e) => {
 
     mostrarFeedbackSucesso(protocolo);
 
-    // Limpa formulário e anexo
     form.reset();
     arquivoSelecionado = null;
     if (anexoInput) anexoInput.value = "";
