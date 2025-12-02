@@ -36,6 +36,8 @@
           <option value="Em atendimento">Em atendimento</option>
           <option value="Resolvido">Resolvido</option>
           <option value="Cancelado">Cancelado</option>
+          <!-- NOVO STATUS -->
+          <option value="Verificando com a GTI">Verificando com a GTI</option>
         </select>
 
         <!-- NOVO: filtro por nome especificamente -->
@@ -82,96 +84,122 @@
 
   <!-- Modal de detalhes do chamado -->
   <div id="detalheChamadoModal" class="modal-overlay hidden">
-  <div class="modal modal-large">
-    <header class="modal-header">
-      <span class="pill pill-primary" id="modalProtocolo">CH-0000</span>
-      <button class="modal-close-btn" id="detalheFecharBtn">×</button>
-    </header>
+    <div class="modal modal-large">
+      <header class="modal-header">
+        <span class="pill pill-primary" id="modalProtocolo">CH-0000</span>
+        <button class="modal-close-btn" id="detalheFecharBtn">×</button>
+      </header>
 
-    <div class="modal-body">
-      <div class="modal-grid">
-        <div>
-          <div class="field-row">
-            <span class="field-label">Data de abertura</span>
-            <span class="field-value" id="modalDataAbertura"></span>
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="field-row">
+              <span class="field-label">Data de abertura</span>
+              <span class="field-value" id="modalDataAbertura"></span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Tempo de abertura</span>
+              <span class="field-value" id="modalTempoAbertura"></span>
+            </div>
           </div>
-          <div class="field-row">
-            <span class="field-label">Tempo de abertura</span>
-            <span class="field-value" id="modalTempoAbertura"></span>
-          </div>
-        </div>
 
-        <div>
-          <div class="field-row">
-            <span class="field-label">Status</span>
-            <select id="modalStatus" class="input-pill">
-              <option value="Em Espera">Em Espera</option>
-              <option value="Em atendimento">Em atendimento</option>
-              <option value="Resolvido">Resolvido</option>
-              <option value="Cancelado">Cancelado</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-grid">
-        <div>
-          <div class="field-row">
-            <span class="field-label">Nome do solicitante</span>
-            <input id="modalNome" class="input-underline" />
+          <div>
+            <div class="field-row">
+              <span class="field-label">Status</span>
+              <select id="modalStatus" class="input-pill">
+                <option value="Em Espera">Em Espera</option>
+                <option value="Em atendimento">Em atendimento</option>
+                <option value="Resolvido">Resolvido</option>
+                <option value="Cancelado">Cancelado</option>
+                <!-- NOVO STATUS -->
+                <option value="Verificando com a GTI">Verificando com a GTI</option>
+              </select>
+            </div>
           </div>
         </div>
-        <div>
-          <div class="field-row">
-            <span class="field-label">Telefone</span>
-            <input id="modalTelefone" class="input-underline" />
+
+        <!-- NOVO GRID: Nome + Categoria (telefone removido) -->
+        <div class="modal-grid">
+          <div>
+            <div class="field-row">
+              <span class="field-label">Nome do solicitante</span>
+              <input id="modalNome" class="input-underline" />
+            </div>
+          </div>
+          <div>
+            <div class="field-row">
+              <span class="field-label">Categoria</span>
+              <select id="modalCategoria" class="input-underline">
+                <option value="">Selecione...</option>
+                <option value="Melhoria Dedalus">Melhoria Dedalus</option>
+                <option value="Melhoria IRIS">Melhoria IRIS</option>
+                <option value="Melhoria Genesys">Melhoria Genesys</option>
+                <option value="Erro de Integração">Erro de Integração</option>
+                <option value="Erro no Fechamento">Erro no Fechamento</option>
+                <option value="Cadastro Estabelecimento">Cadastro Estabelecimento</option>
+                <option value="Treinamento Fornecedor">Treinamento Fornecedor</option>
+                <option value="Treinamento Solicitante">Treinamento Solicitante</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOVO: Urgência (somente aqui, telefone foi removido) -->
+        <div class="field-row">
+          <span class="field-label">Urgência</span>
+          <select id="modalUrgencia" class="input-pill">
+            <option value="">Selecione...</option>
+            <option value="Vermelho - MUITO GRAVE">Vermelho - MUITO GRAVE</option>
+            <option value="Laranja - Hoje (09h às 17h)">Laranja - Hoje (09h às 17h)</option>
+            <option value="Amarelo - Até 3 dias">Amarelo - Até 3 dias</option>
+            <option value="Verde - Até 10 dias">Verde - Até 10 dias</option>
+            <option value="Azul - Demanda Agendada">Azul - Demanda Agendada</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <span class="field-label">Assunto</span>
+          <input id="modalAssunto" class="input-underline" />
+        </div>
+
+        <div class="field-row">
+          <span class="field-label">Descrição</span>
+          <textarea id="modalDescricao" rows="4"></textarea>
+        </div>
+
+        <div class="field-row">
+          <span class="field-label">Anexo</span>
+          <div id="modalAnexoContainer" class="attachment-box">
+            <!-- Preenchido via JS -->
+          </div>
+        </div>
+
+        <!-- CHAT / COMENTÁRIOS (ADM / USUÁRIO) -->
+        <div class="comments-section">
+          <div class="comments-header">
+            <h3 class="comments-title">Mensagens com o usuário</h3>
+          </div>
+          <div id="adminCommentsList" class="comments-list">
+            <!-- Comentários serão carregados via JS -->
+          </div>
+          <div class="comments-input-row">
+            <textarea
+              id="adminNewComment"
+              placeholder="Escreva uma mensagem para o usuário..."
+            ></textarea>
+            <button id="adminSendCommentBtn" class="btn btn-primary btn-small">
+              Enviar
+            </button>
           </div>
         </div>
       </div>
 
-      <div class="field-row">
-        <span class="field-label">Assunto</span>
-        <input id="modalAssunto" class="input-underline" />
-      </div>
-
-      <div class="field-row">
-        <span class="field-label">Descrição</span>
-        <textarea id="modalDescricao" rows="4"></textarea>
-      </div>
-
-      <div class="field-row">
-        <span class="field-label">Anexo</span>
-        <div id="modalAnexoContainer" class="attachment-box">
-          <!-- Preenchido via JS -->
-        </div>
-      </div>
-
-      <!-- CHAT / COMENTÁRIOS (ADM / USUÁRIO) -->
-      <div class="comments-section">
-        <div class="comments-header">
-          <h3 class="comments-title">Mensagens com o usuário</h3>
-        </div>
-        <div id="adminCommentsList" class="comments-list">
-          <!-- Comentários serão carregados via JS -->
-        </div>
-        <div class="comments-input-row">
-          <textarea
-            id="adminNewComment"
-            placeholder="Escreva uma mensagem para o usuário..."
-          ></textarea>
-          <button id="adminSendCommentBtn" class="btn btn-primary btn-small">
-            Enviar
-          </button>
-        </div>
-      </div>
+      <footer class="modal-footer">
+        <button id="modalExcluirBtn" class="btn btn-danger">Excluir</button>
+        <button id="modalSalvarBtn" class="btn btn-primary">Salvar alterações</button>
+      </footer>
     </div>
-
-    <footer class="modal-footer">
-      <button id="modalExcluirBtn" class="btn btn-danger">Excluir</button>
-      <button id="modalSalvarBtn" class="btn btn-primary">Salvar alterações</button>
-    </footer>
   </div>
-</div>
 
   <!-- Modal de confirmação de exclusão -->
   <div id="confirmDeleteModal" class="modal-overlay hidden">
@@ -196,7 +224,7 @@
     </div>
   </div>
 
-  <!-- NOVO: Modal para motivo de finalização -->
+  <!-- Modal para motivo de finalização (já existia, mantido igual) -->
   <div id="finalizarModal" class="modal-overlay hidden">
     <div class="modal">
       <div class="modal-icon">✅</div>
@@ -210,6 +238,15 @@
         <button id="finalizarCancelarBtn" class="btn btn-secondary">Cancelar</button>
         <button id="finalizarConfirmarBtn" class="btn btn-primary">Finalizar chamado</button>
       </div>
+    </div>
+  </div>
+
+  <!-- NOVO: LOADING GLOBAL PARA TODAS AS OPERAÇÕES ASSÍNCRONAS NO ADMIN -->
+  <div id="globalLoading" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-icon">⏳</div>
+      <h3>Processando...</h3>
+      <p class="small muted">Aguarde enquanto aplicamos as alterações.</p>
     </div>
   </div>
 

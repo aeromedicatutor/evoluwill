@@ -21,7 +21,7 @@
   <section class="hero-section">
     <div class="hero-text">
       <h1>Acompanhe seu chamado</h1>
-      <p>Digite o número do protocolo para ver o status.</p>
+      <p>Digite o número do protocolo ou seu nome para ver o status.</p>
     </div>
   </section>
 
@@ -66,6 +66,12 @@
               <span id="acompanharStatus" class="status-pill">Em Espera</span>
             </span>
           </div>
+          <div class="field-row">
+            <span class="field-label">Urgência</span>
+            <span class="field-value">
+              <span id="acompanharUrgencia" class="urgency-pill">-</span>
+            </span>
+          </div>
         </div>
       </div>
 
@@ -78,8 +84,8 @@
         </div>
         <div>
           <div class="field-row">
-            <span class="field-label">Telefone</span>
-            <span class="field-value" id="acompanharTelefone"></span>
+            <span class="field-label">Categoria</span>
+            <span class="field-value" id="acompanharCategoria"></span>
           </div>
         </div>
       </div>
@@ -110,7 +116,7 @@
         <div class="comments-input-row">
           <textarea
             id="userNewComment"
-            placeholder="Escreva uma mensagem para o atendimento..."
+            placeholder="Escreva uma mensagem para o atendimento."
           ></textarea>
           <button id="userSendCommentBtn" class="btn btn-primary btn-small">
             Enviar
@@ -133,6 +139,15 @@
     <h3 id="acompAlertTitle">Mensagem</h3>
     <p id="acompAlertMessage"></p>
     <button id="acompAlertCloseBtn" class="btn btn-secondary">Fechar</button>
+  </div>
+</div>
+
+<!-- LOADING GLOBAL -->
+<div id="globalLoading" class="loading-overlay hidden">
+  <div class="loading-backdrop"></div>
+  <div class="loading-content">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Carregando informações do chamado...</p>
   </div>
 </div>
 

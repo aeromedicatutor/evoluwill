@@ -8,6 +8,7 @@
 // - Logs (tabela + filtros de data/hora)
 // - Chat de comentários dentro do modal (ADM <-> Usuário)
 // - Comentário automático em mudança de status
+// - NOVO: suporte a categoria, urgência e loading global
 // ---------------------------------------------------
 
 import {
@@ -38,6 +39,21 @@ const statusFiltroSelect = document.getElementById("statusFiltro");
 const buscaTextoInput = document.getElementById("buscaTexto");
 const filtroNomeInput = document.getElementById("filtroNome");
 
+// LOADING GLOBAL (overlay que bloqueia a tela durante operações async)
+const globalLoading = document.getElementById("globalLoading");
+
+function mostrarLoading() {
+  if (globalLoading) {
+    globalLoading.classList.remove("hidden");
+  }
+}
+
+function ocultarLoading() {
+  if (globalLoading) {
+    globalLoading.classList.add("hidden");
+  }
+}
+
 // Modal detalhes
 const detalheModal = document.getElementById("detalheChamadoModal");
 const detalheFecharBtn = document.getElementById("detalheFecharBtn");
@@ -46,7 +62,9 @@ const modalDataAberturaSpan = document.getElementById("modalDataAbertura");
 const modalTempoAberturaSpan = document.getElementById("modalTempoAbertura");
 const modalStatusSelect = document.getElementById("modalStatus");
 const modalNomeInput = document.getElementById("modalNome");
-const modalTelefoneInput = document.getElementById("modalTelefone");
+// TELEFONE REMOVIDO DO SISTEMA → não há mais modalTelefoneInput
+const modalCategoriaSelect = document.getElementById("modalCategoria");
+const modalUrgenciaSelect = document.getElementById("modalUrgencia");
 const modalAssuntoInput = document.getElementById("modalAssunto");
 const modalDescricaoTextarea = document.getElementById("modalDescricao");
 const modalAnexoContainer = document.getElementById("modalAnexoContainer");
@@ -192,7 +210,23 @@ function renderizarChamados() {
     tempoSpan.className = "ticket-time";
     tempoSpan.textContent = calcularTempoAbertura(c.createdAt);
 
+    // NOVO: exibir categoria e urgência no card
+    const metaRight = document.createElement("div");
+    metaRight.className = "ticket-meta-right";
+
+    const categoriaSpan = document.createElement("span");
+    categoriaSpan.className = "badge"; // reaproveita visual existente
+    categoriaSpan.textContent = c.categoria || "Sem categoria";
+
+    const urgenciaSpan = document.createElement("span");
+    urgenciaSpan.className = "badge";
+    urgenciaSpan.textContent = c.urgencia || "Sem urgência";
+
+    metaRight.appendChild(categoriaSpan);
+    metaRight.appendChild(urgenciaSpan);
+
     footer.appendChild(tempoSpan);
+    footer.appendChild(metaRight);
 
     card.appendChild(header);
     card.appendChild(titulo);
@@ -220,14 +254,18 @@ function abrirModalDetalhe(chamado) {
   modalTempoAberturaSpan.textContent = calcularTempoAbertura(chamado.createdAt);
   modalStatusSelect.value = chamado.status || "Em Espera";
   modalNomeInput.value = chamado.nome || "";
-  modalTelefoneInput.value = chamado.telefone || "";
+  // TELEFONE REMOVIDO
+  modalCategoriaSelect.value = chamado.categoria || "";
+  modalUrgenciaSelect.value = chamado.urgencia || "";
   modalAssuntoInput.value = chamado.assunto || "";
   modalDescricaoTextarea.value = chamado.descricao || "";
 
   if (chamado.attachmentName) {
     modalAnexoContainer.innerHTML =
       `<strong>${chamado.attachmentName}</strong><br>` +
-      `<span class="small muted">${chamado.attachmentType || ""} - ${(chamado.attachmentSize || 0) / 1024 | 0} KB</span><br>` +
+      `<span class="small muted">${chamado.attachmentType || ""} - ${
+        ((chamado.attachmentSize || 0) / 1024) | 0
+      } KB</span><br>` +
       (chamado.attachmentData
         ? `<a href="${chamado.attachmentData}" target="_blank">Abrir anexo</a>`
         : "");
@@ -254,18 +292,21 @@ modalSalvarBtn?.addEventListener("click", async () => {
 
   const novoStatus = modalStatusSelect.value;
   const novoNome = modalNomeInput.value.trim();
-  const novoTelefone = modalTelefoneInput.value.trim();
+  const novaCategoria = modalCategoriaSelect?.value || "";
+  const novaUrgencia = modalUrgenciaSelect?.value || "";
   const novoAssunto = modalAssuntoInput.value.trim();
   const novaDescricao = modalDescricaoTextarea.value.trim();
 
   const statusAnterior = chamadoSelecionado.status || "";
 
+  mostrarLoading();
   try {
     const docRef = doc(db, "chamados", chamadoSelecionado.id);
     await updateDoc(docRef, {
       status: novoStatus,
       nome: novoNome,
-      telefone: novoTelefone,
+      categoria: novaCategoria,
+      urgencia: novaUrgencia,
       assunto: novoAssunto,
       descricao: novaDescricao,
       updatedAt: new Date()
@@ -314,7 +355,8 @@ modalSalvarBtn?.addEventListener("click", async () => {
     // Atualiza estado em memória até o próximo snapshot
     chamadoSelecionado.status = novoStatus;
     chamadoSelecionado.nome = novoNome;
-    chamadoSelecionado.telefone = novoTelefone;
+    chamadoSelecionado.categoria = novaCategoria;
+    chamadoSelecionado.urgencia = novaUrgencia;
     chamadoSelecionado.assunto = novoAssunto;
     chamadoSelecionado.descricao = novaDescricao;
 
@@ -328,6 +370,8 @@ modalSalvarBtn?.addEventListener("click", async () => {
       details: `Erro ao atualizar chamado: ${err.message}`
     });
     mostrarAdminAlert("Erro", "Não foi possível salvar as alterações.");
+  } finally {
+    ocultarLoading();
   }
 });
 
@@ -377,7 +421,6 @@ function iniciarChatAdm(chamado) {
     }
   );
 }
-
 
 function renderComentariosAdm(lista) {
   adminCommentsList.innerHTML = "";
@@ -432,6 +475,7 @@ async function enviarComentarioAdm() {
   const texto = adminNewCommentTextarea.value.trim();
   if (!texto) return;
 
+  mostrarLoading();
   try {
     await criarComentario({
       chamadoFirestoreId: chamadoSelecionado.id,
@@ -455,6 +499,8 @@ async function enviarComentarioAdm() {
       "Erro ao enviar mensagem",
       "Não foi possível enviar seu comentário. Tente novamente."
     );
+  } finally {
+    ocultarLoading();
   }
 }
 
@@ -486,6 +532,7 @@ confirmDeleteCancelBtn?.addEventListener("click", () => {
 confirmDeleteOkBtn?.addEventListener("click", async () => {
   if (!aguardandoConfirmacaoDelete || !chamadoSelecionado) return;
 
+  mostrarLoading();
   try {
     const docRef = doc(db, "chamados", chamadoSelecionado.id);
     await deleteDoc(docRef);
@@ -512,6 +559,7 @@ confirmDeleteOkBtn?.addEventListener("click", async () => {
     mostrarAdminAlert("Erro", "Não foi possível excluir o chamado.");
   } finally {
     aguardandoConfirmacaoDelete = false;
+    ocultarLoading();
   }
 });
 
@@ -524,6 +572,7 @@ async function carregarLogs() {
   const logsRef = collection(db, "logs");
   const q = query(logsRef, orderBy("createdAt", "desc"));
 
+  mostrarLoading();
   try {
     const snapshot = await getDocs(q);
 
@@ -574,6 +623,8 @@ async function carregarLogs() {
   } catch (err) {
     console.error("Erro ao carregar logs:", err);
     mostrarAdminAlert("Erro", "Não foi possível carregar os logs.");
+  } finally {
+    ocultarLoading();
   }
 }
 

@@ -5,6 +5,7 @@
 // - Conversão do anexo em base64
 // - Criação do documento na coleção "chamados"
 // - Exibição de modal de sucesso/erro
+// - Uso de loading global em operações assíncronas
 // ---------------------------------------------------
 
 import {
@@ -17,13 +18,15 @@ import {
   criarLog,
   gerarProtocolo,
   LIMITE_ANEXO_BYTES,
-  converterArquivoParaBase64
+  converterArquivoParaBase64,
+  mostrarLoading,
+  ocultarLoading
 } from "./common.js";
 
 const form = document.getElementById("chamadoForm");
 const anexoInput = document.getElementById("anexo");
 const anexoNomeSpan = document.getElementById("anexoNome");
-// NOVO: botão estilizado e nome clicável
+// botão estilizado
 const anexoLabel = document.querySelector(".file-label");
 
 const feedbackModal = document.getElementById("feedbackModal");
@@ -77,121 +80,137 @@ anexoInput?.addEventListener("change", (e) => {
 });
 
 // -----------------------
+// MODAIS SIMPLES
+// -----------------------
+
+function mostrarAlertaSimples(titulo, mensagem) {
+  if (!simpleAlertModal) {
+    alert(mensagem);
+    return;
+  }
+  simpleAlertTitle.textContent = titulo;
+  simpleAlertMessage.textContent = mensagem;
+  simpleAlertModal.classList.remove("hidden");
+}
+
+function fecharAlertaSimples() {
+  simpleAlertModal?.classList.add("hidden");
+}
+
+simpleAlertCloseBtn?.addEventListener("click", fecharAlertaSimples);
+
+function mostrarFeedbackSucesso(protocolo) {
+  if (!feedbackModal) return;
+  feedbackIcon.textContent = "✔️";
+  feedbackTitle.textContent = "Chamado enviado com sucesso!";
+  feedbackMessage.innerHTML =
+    'Seu protocolo é <strong id="feedbackProtocolo"></strong>. ' +
+    "Guarde este número para acompanhar o chamado.";
+  feedbackProtocoloSpan.textContent = protocolo;
+  feedbackModal.classList.remove("hidden");
+}
+
+function mostrarFeedbackErro(msg) {
+  if (!feedbackModal) {
+    alert(msg);
+    return;
+  }
+  feedbackIcon.textContent = "❌";
+  feedbackTitle.textContent = "Erro ao enviar chamado";
+  feedbackMessage.textContent = msg;
+  feedbackProtocoloSpan.textContent = "";
+  feedbackModal.classList.remove("hidden");
+}
+
+feedbackCloseBtn?.addEventListener("click", () => {
+  feedbackModal?.classList.add("hidden");
+});
+
+// -----------------------
 // ENVIO DO FORMULÁRIO
 // -----------------------
 form?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const nome = form.nome.value.trim();
-  const telefone = form.telefone.value.trim();
+  const categoria = form.categoria.value;
   const assunto = form.assunto.value.trim();
+  const urgencia = form.urgencia.value;
   const descricao = form.descricao.value.trim();
 
-  if (!nome || !telefone || !assunto || !descricao) {
-    mostrarAlertaSimples("Campos obrigatórios", "Preencha todos os campos antes de enviar.");
+  if (!nome || !categoria || !assunto || !urgencia || !descricao) {
+    mostrarAlertaSimples(
+      "Campos obrigatórios",
+      "Preencha todos os campos antes de enviar."
+    );
     return;
   }
 
-  const protocolo = await gerarProtocolo();
-  const createdAt = serverTimestamp();
-  const status = "Em Espera";
-
-  let attachmentData = null;
+  let anexoBase64 = null;
+  let anexoNome = null;
+  let anexoTipo = null;
 
   try {
-    // Converte arquivo em base64 se houver
+    mostrarLoading();
+
+    // Converte anexo se existir
     if (arquivoSelecionado) {
-      attachmentData = await converterArquivoParaBase64(arquivoSelecionado);
+      anexoBase64 = await converterArquivoParaBase64(arquivoSelecionado);
+      anexoNome = arquivoSelecionado.name;
+      anexoTipo = arquivoSelecionado.type;
     }
 
-    const docRef = await addDoc(collection(db, "chamados"), {
-      protocolo,
-      createdAt,
-      updatedAt: createdAt,
-      status,
-      nome,
-      telefone,
-      assunto,
-      descricao,
-      attachmentName: arquivoSelecionado ? arquivoSelecionado.name : null,
-      attachmentType: arquivoSelecionado ? arquivoSelecionado.type : null,
-      attachmentSize: arquivoSelecionado ? arquivoSelecionado.size : null,
-      attachmentData: attachmentData // Base64 (data URL)
-    });
+    // Gera protocolo legível
+    const protocolo = await gerarProtocolo();
 
-    console.log("Chamado criado:", {
-      id: docRef.id,
-      protocolo,
+    const chamado = {
       nome,
-      status,
-      horario: new Date().toISOString()
-    });
+      categoria,
+      assunto,
+      urgencia,
+      descricao,
+      protocolo,
+      status: "Em Espera",
+      createdAt: serverTimestamp(),
+      anexoBase64: anexoBase64 || null,
+      anexoNome: anexoNome || null,
+      anexoTipo: anexoTipo || null
+    };
+
+    console.log("[CREATE_CHAMADO] Enviando chamado:", chamado);
+
+    const docRef = await addDoc(collection(db, "chamados"), chamado);
+
+    console.log("[CREATE_CHAMADO] Criado com ID:", docRef.id);
 
     await criarLog({
       type: "CREATE_CHAMADO",
       chamadoId: protocolo,
       actorType: "USUARIO",
-      details: `Chamado criado pelo usuário ${nome} com status inicial "${status}".`
+      details: `Chamado criado pelo usuário. Nome: ${nome}, Categoria: ${categoria}, Urgência: ${urgencia}, Status inicial: Em Espera.`
     });
 
-    // Limpa formulário e estado do arquivo
+    mostrarFeedbackSucesso(protocolo);
+
+    // Limpa formulário e anexo
     form.reset();
     arquivoSelecionado = null;
-    anexoNomeSpan.textContent = "Nenhum arquivo selecionado";
-
-    // Mostra modal de sucesso com o protocolo
-    feedbackIcon.textContent = "✔️";
-    feedbackTitle.textContent = "Chamado enviado com sucesso!";
-    feedbackProtocoloSpan.textContent = protocolo;
-    feedbackMessage.innerHTML =
-      `Seu protocolo é <strong>${protocolo}</strong>. ` +
-      "Guarde este número para acompanhar o chamado.";
-    abrirModal(feedbackModal);
+    if (anexoInput) anexoInput.value = "";
+    if (anexoNomeSpan) anexoNomeSpan.textContent = "Nenhum arquivo selecionado";
   } catch (err) {
     console.error("Erro ao criar chamado:", err);
 
     await criarLog({
       type: "ERROR_CREATE_CHAMADO",
-      chamadoId: protocolo,
+      chamadoId: null,
       actorType: "USUARIO",
       details: `Erro ao criar chamado: ${err.message}`
     });
 
-    feedbackIcon.textContent = "❌";
-    feedbackTitle.textContent = "Erro ao enviar chamado";
-    feedbackProtocoloSpan.textContent = "";
-    feedbackMessage.textContent =
-      "Ocorreu um erro ao registrar seu chamado. Tente novamente em alguns instantes.";
-    abrirModal(feedbackModal);
+    mostrarFeedbackErro(
+      "Não foi possível enviar seu chamado no momento. Tente novamente em instantes."
+    );
+  } finally {
+    ocultarLoading();
   }
 });
-
-// -----------------------
-// MODAIS / ALERTAS
-// -----------------------
-feedbackCloseBtn?.addEventListener("click", () => fecharModal(feedbackModal));
-feedbackModal?.addEventListener("click", (e) => {
-  if (e.target === feedbackModal) fecharModal(feedbackModal);
-});
-
-simpleAlertCloseBtn?.addEventListener("click", () => fecharModal(simpleAlertModal));
-simpleAlertModal?.addEventListener("click", (e) => {
-  if (e.target === simpleAlertModal) fecharModal(simpleAlertModal);
-});
-
-// Helpers de modal
-function abrirModal(modal) {
-  if (!modal) return;
-  modal.classList.remove("hidden");
-}
-
-function fecharModal(modal) {
-  if (!modal) return;
-  modal.classList.add("hidden");
-}
-
-function mostrarAlertaSimples(titulo, mensagem) {
-  simpleAlertTitle.textContent = titulo;
-  simpleAlertMessage.textContent = mensagem;
-  abrirModal(simpleAlertModal);
-}

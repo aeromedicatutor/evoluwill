@@ -7,6 +7,7 @@
 // - Usuário pode CANCELAR o chamado (UPDATE de status)
 // - Chat de comentários (usuário/ADM) dentro do modal
 // - Gera logs em Firestore (coleção "logs")
+// - Usa loading global em operações assíncronas
 // ---------------------------------------------------
 
 import {
@@ -24,7 +25,9 @@ import {
   criarComentario,
   calcularTempoAbertura,
   formatarDataHora,
-  aplicarClasseStatus
+  aplicarClasseStatus,
+  mostrarLoading,
+  ocultarLoading
 } from "./common.js";
 
 // ELEMENTOS DA PÁGINA
@@ -41,7 +44,8 @@ const acompanharTempoAberturaSpan = document.getElementById("acompanharTempoAber
 const acompanharStatusSpan = document.getElementById("acompanharStatus");
 const acompModalProtocoloSpan = document.getElementById("acompModalProtocolo");
 const acompanharNomeSpan = document.getElementById("acompanharNome");
-const acompanharTelefoneSpan = document.getElementById("acompanharTelefone");
+const acompanharCategoriaSpan = document.getElementById("acompanharCategoria");
+const acompanharUrgenciaSpan = document.getElementById("acompanharUrgencia");
 const acompanharAssuntoSpan = document.getElementById("acompanharAssunto");
 const acompanharDescricaoDiv = document.getElementById("acompanharDescricao");
 const acompanharAnexoContainer = document.getElementById("acompanharAnexoContainer");
@@ -61,6 +65,38 @@ const acompAlertCloseBtn = document.getElementById("acompAlertCloseBtn");
 // Estado local
 let chamadoAtual = null; // chamado selecionado no modal
 let unsubscribeComentariosUser = null; // para parar o listener do chat
+
+// -----------------------
+// HELPERS
+// -----------------------
+
+function mostrarAcompAlert(titulo, mensagem) {
+  if (!acompAlertModal) {
+    alert(mensagem);
+    return;
+  }
+  acompAlertTitle.textContent = titulo;
+  acompAlertMessage.textContent = mensagem;
+  acompAlertModal.classList.remove("hidden");
+}
+
+function fecharAcompAlert() {
+  acompAlertModal?.classList.add("hidden");
+}
+
+acompAlertCloseBtn?.addEventListener("click", fecharAcompAlert);
+
+function mapearClasseUrgencia(urgencia) {
+  if (!urgencia) return "urgency-azul";
+
+  const texto = urgencia.toLowerCase();
+  if (texto.startsWith("vermelho")) return "urgency-vermelho";
+  if (texto.startsWith("laranja")) return "urgency-laranja";
+  if (texto.startsWith("amarelo")) return "urgency-amarelo";
+  if (texto.startsWith("verde")) return "urgency-verde";
+  if (texto.startsWith("azul")) return "urgency-azul";
+  return "urgency-azul";
+}
 
 // -----------------------
 // BUSCA (PROTOCOLO / NOME)
@@ -93,7 +129,10 @@ async function buscarChamados() {
   const nome = nomeInput?.value.trim().toLowerCase() || "";
 
   if (!protocolo && !nome) {
-    mostrarAcompAlert("Atenção", "Digite um número de protocolo ou um nome para buscar.");
+    mostrarAcompAlert(
+      "Atenção",
+      "Digite um número de protocolo ou um nome para buscar."
+    );
     return;
   }
 
@@ -101,6 +140,8 @@ async function buscarChamados() {
     '<p class="small muted">Buscando chamados...</p>';
 
   try {
+    mostrarLoading();
+
     const chamadosRef = collection(db, "chamados");
 
     // 1) Busca por PROTOCOLO (mais exata)
@@ -121,7 +162,8 @@ async function buscarChamados() {
           type: "READ_CHAMADO_NOT_FOUND",
           chamadoId: protocolo,
           actorType: "USUARIO",
-          details: "Usuário tentou consultar protocolo inexistente ou não encontrado."
+          details:
+            "Usuário tentou consultar protocolo inexistente ou não encontrado."
         });
 
         return;
@@ -145,67 +187,65 @@ async function buscarChamados() {
       return;
     }
 
-    // 2) Não há protocolo -> busca por NOME (client-side)
-    console.log("Buscando por nome (client-side):", nome);
-
-    const snapshot = await getDocs(chamadosRef);
-    console.log("Snapshot total de chamados (para filtro por nome):", snapshot.size);
-
-    let chamados = snapshot.docs.map((docSnap) => ({
-      id: docSnap.id,
-      ...docSnap.data()
-    }));
-
-    chamados = chamados.filter((c) =>
-      (c.nome || "").toLowerCase().includes(nome)
+    // 2) Não há protocolo → busca por nome
+    console.log("Buscando por nome:", nome);
+    const qNome = query(
+      chamadosRef,
+      where("nome", ">=", nome),
+      where("nome", "<=", nome + "\uf8ff")
     );
+    const snapshotNome = await getDocs(qNome);
 
-    console.log("Chamados encontrados por nome:", chamados.length);
-
-    if (chamados.length === 0) {
+    if (snapshotNome.empty) {
       acompanhamentoResultado.innerHTML =
         '<p class="small muted">Nenhum chamado encontrado para este nome.</p>';
 
       await criarLog({
-        type: "READ_CHAMADO_NOT_FOUND_NOME",
+        type: "READ_CHAMADO_NOT_FOUND",
         chamadoId: null,
         actorType: "USUARIO",
-        details: `Usuário tentou consultar por nome "${nome}", sem resultados.`
+        details:
+          "Usuário tentou consultar por nome, mas nenhum chamado foi encontrado."
       });
 
       return;
     }
 
+    const chamadosPorNome = snapshotNome.docs.map((docSnap) => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    }));
+
     await criarLog({
-      type: "READ_CHAMADOS_BY_NOME",
+      type: "READ_CHAMADO",
       chamadoId: null,
       actorType: "USUARIO",
-      details: `Usuário consultou ${chamados.length} chamados pelo nome "${nome}".`
+      details: "Usuário consultou chamados pelo nome."
     });
 
-    renderizarListaChamados(chamados);
+    renderizarListaChamados(chamadosPorNome);
   } catch (err) {
     console.error("Erro ao buscar chamados:", err);
-    acompanhamentoResultado.innerHTML =
-      '<p class="small muted">Não foi possível buscar. Tente novamente mais tarde.</p>';
 
     await criarLog({
       type: "ERROR_READ_CHAMADO",
       chamadoId: null,
       actorType: "USUARIO",
-      details: `Erro ao buscar chamado: ${err.message}`
+      details: `Erro ao buscar chamados: ${err.message}`
     });
 
     mostrarAcompAlert(
-      "Erro ao buscar chamado",
-      "Ocorreu um erro ao consultar. Tente novamente em alguns instantes."
+      "Erro",
+      "Não foi possível buscar os chamados. Tente novamente mais tarde."
     );
+  } finally {
+    ocultarLoading();
   }
 }
 
-/**
- * Renderiza lista de chamados em forma de cards.
- */
+// -----------------------
+// RENDERIZAÇÃO DOS CARDS
+// -----------------------
 function renderizarListaChamados(chamados) {
   acompanhamentoResultado.innerHTML = "";
 
@@ -215,338 +255,240 @@ function renderizarListaChamados(chamados) {
     return;
   }
 
-  chamados.forEach((chamado) => {
+  chamados.forEach((c) => {
     const card = document.createElement("article");
     card.className = "ticket-card";
 
-    const header = document.createElement("div");
-    header.className = "ticket-header";
+    const tempoAbertura = c.createdAt ? calcularTempoAbertura(c.createdAt) : "-";
 
-    const protocoloSpan = document.createElement("span");
-    protocoloSpan.className = "ticket-protocol";
-    protocoloSpan.textContent = chamado.protocolo || "(sem protocolo)";
+    const urgenciaClasse = mapearClasseUrgencia(c.urgencia);
+    const urgenciaTexto = c.urgencia || "-";
 
-    const statusSpan = document.createElement("span");
-    aplicarClasseStatus(statusSpan, chamado.status);
-    statusSpan.textContent = chamado.status || "-";
+    card.innerHTML = `
+      <header class="ticket-card-header">
+        <span class="pill pill-primary">${c.protocolo || "Sem protocolo"}</span>
+        <span class="status-pill status-${(c.status || "")
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+          .replace(/\s+/g, "-")}">
+          ${c.status || "Sem status"}
+        </span>
+      </header>
+      <div class="ticket-card-body">
+        <h3 class="ticket-title">${c.assunto || "Sem assunto"}</h3>
+        <p class="ticket-meta">
+          <strong>Solicitante:</strong> ${c.nome || "-"}<br/>
+          <strong>Categoria:</strong> ${c.categoria || "-"}
+        </p>
+        <p class="ticket-meta">
+          <strong>Urgência:</strong>
+          <span class="urgency-pill ${urgenciaClasse}">${urgenciaTexto}</span>
+        </p>
+        <p class="ticket-time">${tempoAbertura}</p>
+      </div>
+    `;
 
-    header.appendChild(protocoloSpan);
-    header.appendChild(statusSpan);
-
-    const titulo = document.createElement("div");
-    titulo.className = "ticket-title";
-    titulo.textContent = chamado.assunto || "(sem assunto)";
-
-    const subtitle = document.createElement("div");
-    subtitle.className = "ticket-subtitle";
-    subtitle.textContent = chamado.nome || "(sem nome)";
-
-    const footer = document.createElement("div");
-    footer.className = "ticket-footer";
-
-    const tempoSpan = document.createElement("span");
-    tempoSpan.className = "ticket-time";
-    tempoSpan.textContent = calcularTempoAbertura(chamado.createdAt);
-
-    footer.appendChild(tempoSpan);
-
-    card.appendChild(header);
-    card.appendChild(titulo);
-    card.appendChild(subtitle);
-    card.appendChild(footer);
-
-    card.addEventListener("click", () => abrirModalAcompanhamento(chamado));
+    card.addEventListener("click", () => {
+      abrirModalAcompanhamento(c);
+    });
 
     acompanhamentoResultado.appendChild(card);
   });
 }
 
 // -----------------------
-// MODAL DE ACOMPANHAMENTO
+// MODAL ACOMPANHAMENTO
 // -----------------------
 function abrirModalAcompanhamento(chamado) {
-  if (!chamado) return;
-
   chamadoAtual = chamado;
 
-  acompModalProtocoloSpan.textContent = chamado.protocolo || "";
-  acompanharDataAberturaSpan.textContent = formatarDataHora(chamado.createdAt);
-  acompanharTempoAberturaSpan.textContent = calcularTempoAbertura(chamado.createdAt);
-
-  aplicarClasseStatus(acompanharStatusSpan, chamado.status);
-  acompanharStatusSpan.textContent = chamado.status || "-";
+  acompModalProtocoloSpan.textContent = chamado.protocolo || "-";
+  acompanharDataAberturaSpan.textContent = chamado.createdAt
+    ? formatarDataHora(chamado.createdAt)
+    : "-";
+  acompanharTempoAberturaSpan.textContent = chamado.createdAt
+    ? calcularTempoAbertura(chamado.createdAt)
+    : "-";
 
   acompanharNomeSpan.textContent = chamado.nome || "-";
-  acompanharTelefoneSpan.textContent = chamado.telefone || "-";
+  acompanharCategoriaSpan.textContent = chamado.categoria || "-";
   acompanharAssuntoSpan.textContent = chamado.assunto || "-";
   acompanharDescricaoDiv.textContent = chamado.descricao || "-";
 
-  if (chamado.attachmentName) {
-    acompanharAnexoContainer.innerHTML =
-      `<strong>${chamado.attachmentName}</strong><br>` +
-      `<span class="small muted">${chamado.attachmentType || ""} - ${(chamado.attachmentSize || 0) / 1024 | 0} KB</span><br>` +
-      (chamado.attachmentData
-        ? `<a href="${chamado.attachmentData}" target="_blank">Abrir anexo</a>`
-        : '<span class="small muted">Pré-visualização indisponível.</span>');
+  // Status
+  aplicarClasseStatus(acompanharStatusSpan, chamado.status || "Em Espera");
+
+  // Urgência
+  const urgenciaTexto = chamado.urgencia || "-";
+  acompanharUrgenciaSpan.textContent = urgenciaTexto;
+  acompanharUrgenciaSpan.className = "urgency-pill " + mapearClasseUrgencia(urgenciaTexto);
+
+  // Anexo
+  acompanharAnexoContainer.innerHTML = "";
+  if (chamado.anexoBase64 && chamado.anexoNome) {
+    const link = document.createElement("a");
+    link.href = chamado.anexoBase64;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = chamado.anexoNome;
+    acompanharAnexoContainer.appendChild(link);
   } else {
     acompanharAnexoContainer.textContent = "Nenhum anexo.";
   }
 
-  // Inicia/renova listener de comentários (chat)
-  iniciarChatUsuario(chamado);
+  // Listener de comentários
+  iniciarListenerComentarios(chamado);
 
-  abrirModal(acompanharModal);
+  acompanharModal.classList.remove("hidden");
 }
 
-acompanharFecharBtn?.addEventListener("click", () =>
-  fecharModal(acompanharModal)
-);
-
-acompanharModal?.addEventListener("click", (e) => {
-  if (e.target === acompanharModal) {
-    fecharModal(acompanharModal);
+acompanharFecharBtn?.addEventListener("click", () => {
+  acompanharModal.classList.add("hidden");
+  if (unsubscribeComentariosUser) {
+    unsubscribeComentariosUser();
+    unsubscribeComentariosUser = null;
   }
 });
 
-// -----------------------
-// CHAT / COMENTÁRIOS (USUÁRIO)
-// -----------------------
-
-function iniciarChatUsuario(chamado) {
-  if (!userCommentsList) return;
-
-  // Encerra listener anterior, se existir
+/**
+ * Listener em tempo real de comentários para o chamado atual.
+ */
+function iniciarListenerComentarios(chamado) {
   if (unsubscribeComentariosUser) {
     unsubscribeComentariosUser();
     unsubscribeComentariosUser = null;
   }
 
-  userCommentsList.innerHTML =
-    '<p class="small muted">Carregando mensagens...</p>';
-
   const comentariosRef = collection(db, "comentarios");
-
-  // Sem orderBy na query (evita índice composto)
-  const q = query(
-    comentariosRef,
-    where("chamadoId", "==", chamado.id)
-  );
+  const q = query(comentariosRef, where("chamadoId", "==", chamado.id));
 
   unsubscribeComentariosUser = onSnapshot(
     q,
     (snapshot) => {
-      let comentarios = snapshot.docs.map((docSnap) => ({
-        id: docSnap.id,
-        ...docSnap.data()
-      }));
+      const comentarios = snapshot.docs
+        .map((d) => d.data())
+        .sort((a, b) => {
+          const da = a.createdAt?.toMillis?.() ?? 0;
+          const dbb = b.createdAt?.toMillis?.() ?? 0;
+          return da - dbb;
+        });
 
-      // Ordena no cliente por createdAt (mais antigo -> mais recente)
-      comentarios = comentarios.sort((a, b) => {
-        const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
-        const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
-        return ta - tb;
+      userCommentsList.innerHTML = "";
+
+      comentarios.forEach((c) => {
+        const item = document.createElement("div");
+        item.className =
+          "comment-item " +
+          (c.autorTipo === "ADM" ? "comment-adm" : "comment-user");
+
+        const dataStr = c.createdAt ? formatarDataHora(c.createdAt) : "";
+        item.innerHTML = `
+          <div class="comment-meta">
+            <span class="comment-author">${c.autorTipo || "-"}</span>
+            <span class="comment-date">${dataStr}</span>
+          </div>
+          <div class="comment-text">
+            ${c.mensagem || ""}
+          </div>
+        `;
+        userCommentsList.appendChild(item);
       });
 
-      renderComentariosUsuario(comentarios);
+      userCommentsList.scrollTop = userCommentsList.scrollHeight;
     },
     (error) => {
       console.error("Erro ao ouvir comentários:", error);
-      userCommentsList.innerHTML =
-        '<p class="small muted">Não foi possível carregar as mensagens.</p>';
     }
   );
 }
 
-function renderComentariosUsuario(lista) {
-  userCommentsList.innerHTML = "";
+// -----------------------
+// CANCELAR CHAMADO (USUÁRIO)
+// -----------------------
+cancelarChamadoBtn?.addEventListener("click", async () => {
+  if (!chamadoAtual) return;
 
-  if (!lista || lista.length === 0) {
-    userCommentsList.innerHTML =
-      '<p class="small muted">Nenhuma mensagem ainda. Você pode enviar uma dúvida aqui.</p>';
-    return;
-  }
-
-  lista.forEach((c) => {
-    const wrapper = document.createElement("div");
-    wrapper.className = "comment-wrapper";
-
-    const bubble = document.createElement("div");
-    bubble.className = "comment-bubble";
-
-    const isUsuario = c.autorTipo === "USUARIO";
-    const isAdm = c.autorTipo === "ADM";
-
-    if (isUsuario) {
-      bubble.classList.add("comment-user");
-    } else if (isAdm) {
-      bubble.classList.add("comment-admin");
-    }
-
-    const meta = document.createElement("div");
-    meta.className = "comment-meta";
-    const quem = isAdm ? "Atendimento" : "Você";
-    meta.textContent = `${quem} • ${formatarDataHora(c.createdAt)}`;
-
-    const texto = document.createElement("div");
-    texto.className = "comment-text";
-    texto.textContent = c.mensagem || "";
-
-    bubble.appendChild(meta);
-    bubble.appendChild(texto);
-    wrapper.appendChild(bubble);
-
-    userCommentsList.appendChild(wrapper);
-  });
-
-  userCommentsList.scrollTop = userCommentsList.scrollHeight;
-}
-
-// Enviar comentário pelo usuário
-async function enviarComentarioUsuario() {
-  if (!chamadoAtual) {
-    mostrarAcompAlert("Nenhum chamado", "Abra um chamado antes de comentar.");
-    return;
-  }
-  const texto = userNewCommentTextarea.value.trim();
-  if (!texto) return;
+  const confirmar = confirm(
+    "Tem certeza que deseja cancelar este chamado? O status será alterado para 'Cancelado'."
+  );
+  if (!confirmar) return;
 
   try {
+    mostrarLoading();
+
+    const chamadoRef = doc(db, "chamados", chamadoAtual.id);
+    await updateDoc(chamadoRef, {
+      status: "Cancelado"
+    });
+
+    await criarLog({
+      type: "CANCELAR_CHAMADO_USUARIO",
+      chamadoId: chamadoAtual.protocolo || chamadoAtual.id,
+      actorType: "USUARIO",
+      details: "Usuário cancelou o chamado via página de acompanhamento."
+    });
+
     await criarComentario({
       chamadoFirestoreId: chamadoAtual.id,
       protocolo: chamadoAtual.protocolo,
       actorType: "USUARIO",
-      mensagem: texto,
-      origem: "CHAT_USUARIO"
+      origem: "CANCELAMENTO_USUARIO",
+      mensagem: "Chamado cancelado pelo usuário via acompanhamento."
     });
 
+    mostrarAcompAlert(
+      "Chamado cancelado",
+      "Seu chamado foi cancelado com sucesso."
+    );
+
+    acompanharModal.classList.add("hidden");
+  } catch (err) {
+    console.error("Erro ao cancelar chamado:", err);
+
     await criarLog({
-      type: "CREATE_COMENTARIO_USUARIO",
-      chamadoId: chamadoAtual.protocolo,
+      type: "ERROR_CANCELAR_CHAMADO_USUARIO",
+      chamadoId: chamadoAtual.protocolo || chamadoAtual.id,
       actorType: "USUARIO",
-      details: `Usuário adicionou um comentário no chamado.`
+      details: `Erro ao cancelar chamado: ${err.message}`
+    });
+
+    mostrarAcompAlert(
+      "Erro ao cancelar",
+      "Não foi possível cancelar o chamado. Tente novamente."
+    );
+  } finally {
+    ocultarLoading();
+  }
+});
+
+// -----------------------
+// ENVIO DE COMENTÁRIO PELO USUÁRIO
+// -----------------------
+userSendCommentBtn?.addEventListener("click", async () => {
+  if (!chamadoAtual) return;
+  const texto = userNewCommentTextarea.value.trim();
+  if (!texto) return;
+
+  try {
+    mostrarLoading();
+
+    await criarComentario({
+      chamadoFirestoreId: chamadoAtual.id,
+      protocolo: chamadoAtual.protocolo,
+      actorType: "USUARIO",
+      origem: "MANUAL_USUARIO",
+      mensagem: texto
     });
 
     userNewCommentTextarea.value = "";
   } catch (err) {
     console.error("Erro ao enviar comentário do usuário:", err);
     mostrarAcompAlert(
-      "Erro ao enviar mensagem",
-      "Não foi possível enviar seu comentário. Tente novamente."
+      "Erro",
+      "Não foi possível enviar sua mensagem. Tente novamente."
     );
+  } finally {
+    ocultarLoading();
   }
-}
-
-userSendCommentBtn?.addEventListener("click", () => {
-  enviarComentarioUsuario();
-});
-
-userNewCommentTextarea?.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    enviarComentarioUsuario();
-  }
-});
-
-// -----------------------
-// CANCELAMENTO DO CHAMADO
-// -----------------------
-cancelarChamadoBtn?.addEventListener("click", async () => {
-  if (!chamadoAtual) {
-    mostrarAcompAlert(
-      "Nenhum chamado selecionado",
-      "Busque um protocolo e abra os detalhes do chamado antes de cancelar."
-    );
-    return;
-  }
-
-  if (chamadoAtual.status === "Cancelado") {
-    mostrarAcompAlert(
-      "Chamado já cancelado",
-      "Este chamado já está com status 'Cancelado'."
-    );
-    return;
-  }
-
-  if (chamadoAtual.status === "Resolvido") {
-    mostrarAcompAlert(
-      "Chamado já resolvido",
-      "Este chamado já foi marcado como 'Resolvido' pelo atendimento."
-    );
-    return;
-  }
-
-  try {
-    const docRef = doc(db, "chamados", chamadoAtual.id);
-    await updateDoc(docRef, {
-      status: "Cancelado",
-      updatedAt: new Date()
-    });
-
-    console.log("Chamado cancelado pelo usuário:", chamadoAtual.protocolo);
-
-    chamadoAtual.status = "Cancelado";
-    aplicarClasseStatus(acompanharStatusSpan, chamadoAtual.status);
-    acompanharStatusSpan.textContent = chamadoAtual.status;
-
-    await criarComentario({
-      chamadoFirestoreId: chamadoAtual.id,
-      protocolo: chamadoAtual.protocolo,
-      actorType: "USUARIO",
-      mensagem: "Usuário cancelou o chamado. Status alterado para 'Cancelado'.",
-      origem: "CANCELAMENTO_USUARIO"
-    });
-
-    await criarLog({
-      type: "CANCEL_CHAMADO_USUARIO",
-      chamadoId: chamadoAtual.protocolo,
-      actorType: "USUARIO",
-      details: "Usuário cancelou o chamado (status 'Cancelado')."
-    });
-
-    mostrarAcompAlert(
-      "Chamado cancelado",
-      "Seu chamado foi cancelado com sucesso. Caso precise, você pode abrir um novo chamado a qualquer momento."
-    );
-  } catch (err) {
-    console.error("Erro ao cancelar chamado:", err);
-
-    await criarLog({
-      type: "ERROR_CANCEL_CHAMADO_USUARIO",
-      chamadoId: chamadoAtual.protocolo,
-      actorType: "USUARIO",
-      details: `Erro ao cancelar chamado: ${err.message}`
-    });
-
-    mostrarAcompAlert(
-      "Erro ao cancelar chamado",
-      "Não foi possível cancelar o chamado. Tente novamente em alguns instantes."
-    );
-  }
-});
-
-// -----------------------
-// HELPERS DE MODAL/ALERTA
-// -----------------------
-function abrirModal(modal) {
-  if (!modal) return;
-  modal.classList.remove("hidden");
-}
-
-function fecharModal(modal) {
-  if (!modal) return;
-  modal.classList.add("hidden");
-}
-
-function mostrarAcompAlert(titulo, mensagem) {
-  acompAlertTitle.textContent = titulo;
-  acompAlertMessage.textContent = mensagem;
-  abrirModal(acompAlertModal);
-}
-
-acompAlertCloseBtn?.addEventListener("click", () =>
-  fecharModal(acompAlertModal)
-);
-
-acompAlertModal?.addEventListener("click", (e) => {
-  if (e.target === acompAlertModal) fecharModal(acompAlertModal);
 });

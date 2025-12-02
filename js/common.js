@@ -101,24 +101,142 @@ export function formatarDataHora(ts) {
 }
 
 /**
- * Retorna string tipo "Aberto há 2h 35min" ou "Aberto há 3 dias".
+ * Helpers internos para cálculo de tempo útil (SLA)
+ * - Considera apenas dias úteis (segunda a sexta)
+ * - Apenas janela 09:00 às 18:00
+ * - Se aberto em fim de semana, começa a contar apenas na segunda às 09h
+ * - Se aberto fora do horário comercial, começa no próximo dia útil às 09h
+ */
+
+// Retorna se é sábado (6) ou domingo (0)
+function ehFinalDeSemana(date) {
+  const dia = date.getDay();
+  return dia === 0 || dia === 6;
+}
+
+// Avança para o próximo dia útil às 09:00
+function proximoDiaUtilAs9(date) {
+  const d = new Date(date);
+  d.setSeconds(0, 0);
+
+  let dia = d.getDay(); // 0=Dom, 6=Sab
+
+  if (dia === 6) {
+    // Sábado -> segunda
+    d.setDate(d.getDate() + 2);
+    d.setHours(9, 0, 0, 0);
+  } else if (dia === 0) {
+    // Domingo -> segunda
+    d.setDate(d.getDate() + 1);
+    d.setHours(9, 0, 0, 0);
+  } else {
+    // Dia útil
+    if (d.getHours() < 9) {
+      d.setHours(9, 0, 0, 0);
+    } else if (d.getHours() >= 18) {
+      // Vai para o próximo dia útil às 9h
+      let add = 1;
+      if (dia === 5) {
+        // sexta -> segunda
+        add = 3;
+      }
+      d.setDate(d.getDate() + add);
+      d.setHours(9, 0, 0, 0);
+    }
+  }
+
+  return d;
+}
+
+/**
+ * Calcula a quantidade de minutos úteis (09h–18h, dias úteis)
+ * entre duas datas.
+ */
+function calcularMinutosUteisEntre(startDate, endDate) {
+  if (endDate <= startDate) return 0;
+
+  let totalMin = 0;
+  let atual = new Date(startDate);
+
+  while (atual < endDate) {
+    // Se final de semana, pula direto pro próximo dia útil às 9h
+    if (ehFinalDeSemana(atual)) {
+      atual = proximoDiaUtilAs9(atual);
+      continue;
+    }
+
+    // Define janela do dia atual [09:00, 18:00]
+    const inicioDia = new Date(atual);
+    inicioDia.setHours(9, 0, 0, 0);
+
+    const fimDia = new Date(atual);
+    fimDia.setHours(18, 0, 0, 0);
+
+    // Se ainda não chegou em 09h, ajusta
+    if (atual < inicioDia) {
+      atual = new Date(inicioDia);
+    }
+
+    // Se já passou das 18h, pula para próximo dia útil
+    if (atual >= fimDia) {
+      atual = proximoDiaUtilAs9(atual);
+      continue;
+    }
+
+    // Janela efetiva deste dia: [atual, fimDia] limitado ao endDate
+    const limite = endDate < fimDia ? endDate : fimDia;
+    const diffMs = limite.getTime() - atual.getTime();
+    if (diffMs > 0) {
+      totalMin += Math.floor(diffMs / 60000);
+    }
+
+    // Avança para próximo dia útil
+    atual = proximoDiaUtilAs9(fimDia);
+  }
+
+  return totalMin;
+}
+
+/**
+ * Retorna string tipo:
+ *  - "Aberto há 2 dias"
+ *  - "Aberto há 3h 15min"
+ *  - "Aberto há 10min"
+ *
+ * Usando apenas tempo útil (segunda–sexta, 09h–18h).
  */
 export function calcularTempoAbertura(ts) {
   if (!ts) return "-";
-  const start = ts.toDate ? ts.toDate() : ts;
-  const diffMs = Date.now() - start.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  const diffHoras = Math.floor(diffMin / 60);
-  const diffDias = Math.floor(diffHoras / 24);
 
-  if (diffDias > 0) {
-    return `Aberto há ${diffDias} dia${diffDias > 1 ? "s" : ""}`;
+  const created = ts.toDate ? ts.toDate() : ts;
+  const agora = new Date();
+
+  // Ponto inicial do SLA ajustado
+  const inicioSla = proximoDiaUtilAs9(created);
+
+  if (agora <= inicioSla) {
+    return "Aberto há 0min (aguardando início do SLA)";
   }
-  if (diffHoras > 0) {
-    const restMin = diffMin % 60;
-    return `Aberto há ${diffHoras}h ${restMin}min`;
+
+  const minutosUteis = calcularMinutosUteisEntre(inicioSla, agora);
+  if (minutosUteis <= 0) {
+    return "Aberto há 0min";
   }
-  return `Aberto há ${diffMin}min`;
+
+  const horas = Math.floor(minutosUteis / 60);
+  const dias = Math.floor(horas / 9); // 9h de janela por dia útil
+  const restoHoras = horas % 9;
+  const restoMin = minutosUteis % 60;
+
+  if (dias > 0) {
+    return `Aberto há ${dias} dia${dias > 1 ? "s" : ""}`;
+  }
+
+  if (horas > 0) {
+    return `Aberto há ${horas}h ${restoMin}min`;
+  }
+
+  return `Aberto há ${minutosUteis}min`;
 }
 
 /**
@@ -181,12 +299,12 @@ export async function gerarProtocolo() {
   return `CH-${ano}-${sequencial}`;
 }
 
-
 /**
  * Define classe CSS de status para o elemento (pill).
  * Gera nomes de classe sem espaços, ex:
  *  "Em Espera"      -> status-em-espera
  *  "Em Atendimento" -> status-em-atendimento
+ *  "Verificando com a GTI" -> status-verificando-com-a-gti
  */
 export function aplicarClasseStatus(element, status) {
   element.className = "status-pill";
@@ -221,4 +339,26 @@ export function converterArquivoParaBase64(file) {
     };
     reader.readAsDataURL(file);
   });
+}
+
+/**
+ * LOADING GLOBAL
+ * - Usa o elemento #globalLoading presente em TODAS as páginas.
+ * - Aparece sobre a tela inteira e bloqueia cliques.
+ */
+export function mostrarLoading() {
+  const overlay = document.getElementById("globalLoading");
+  if (!overlay) return;
+  overlay.classList.remove("hidden");
+  overlay.classList.add("active");
+}
+
+export function ocultarLoading() {
+  const overlay = document.getElementById("globalLoading");
+  if (!overlay) return;
+  overlay.classList.remove("active");
+  // pequeno delay para animação, opcional
+  setTimeout(() => {
+    overlay.classList.add("hidden");
+  }, 180);
 }

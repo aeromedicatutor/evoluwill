@@ -160,13 +160,15 @@ html, body {
 }
 
 .form-field input,
-.form-field textarea {
+.form-field textarea,
+.form-field select {
   border-radius: 12px;
   border: 1px solid var(--color-border);
   padding: 10px 12px;
   font-size: 14px;
   outline: none;
   transition: border var(--transition-fast), box-shadow var(--transition-fast);
+  background: #fff;
 }
 
 .form-field textarea {
@@ -175,7 +177,8 @@ html, body {
 }
 
 .form-field input:focus,
-.form-field textarea:focus {
+.form-field textarea:focus,
+.form-field select:focus {
   border-color: var(--color-primary-soft);
   box-shadow: 0 0 0 1px rgba(7, 90, 43, 0.18);
 }
@@ -335,6 +338,11 @@ html, body {
 .status-cancelado {
   background: #f8d7da;
   color: #721c24;
+}
+/* NOVO STATUS: Verificando com a GTI */
+.status-verificando-com-a-gti {
+  background: #e1ecff;
+  color: #1f4f9a;
 }
 
 /* =========================
@@ -763,6 +771,107 @@ textarea#modalDescricao {
   max-height: 120px;
 }
 
+/* ============================================
+   LOADING GLOBAL
+   ============================================ */
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+}
+
+.loading-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.loading-overlay .loading-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+}
+
+.loading-overlay .loading-content {
+  position: relative;
+  z-index: 1;
+  background: #ffffff;
+  padding: 16px 24px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.loading-spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid rgba(7, 90, 43, 0.18);
+  border-top-color: var(--color-primary);
+  animation: loading-spin 0.8s linear infinite;
+}
+
+.loading-text {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+@keyframes loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   PILL DE URGÊNCIA
+   ============================================ */
+
+.urgency-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* Mapeamento de cores por urgência */
+.urgency-vermelho {
+  background: #ffe5e5;
+  color: #b00020;
+}
+
+.urgency-laranja {
+  background: #ffe9d6;
+  color: #b85a00;
+}
+
+.urgency-amarelo {
+  background: #fff8d1;
+  color: #a17b00;
+}
+
+.urgency-verde {
+  background: #e0f6ea;
+  color: #0b7f3d;
+}
+
+.urgency-azul {
+  background: #e2f0ff;
+  color: #135b9c;
+}
 
 /* RESPONSIVO */
 @media (max-width: 860px) {
@@ -789,5 +898,4 @@ textarea#modalDescricao {
     flex-direction: column;
     align-items: stretch;
   }
-
 }

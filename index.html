@@ -32,18 +32,44 @@
       <!-- Formulário de criação do chamado -->
       <form id="chamadoForm" class="form-grid">
         <div class="form-field">
-          <label for="nome">Nome do Colaborador</label>
+          <label for="nome">Nome do solicitante</label>
           <input type="text" id="nome" name="nome" required />
         </div>
 
+        <!-- NOVO: Categoria -->
         <div class="form-field">
-          <label for="telefone">Telefone do solicitante</label>
-          <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" required />
+          <label for="categoria">Categoria</label>
+          <select id="categoria" name="categoria" required>
+            <option value="">Selecione...</option>
+            <option value="Melhoria Dedalus">Melhoria Dedalus</option>
+            <option value="Melhoria IRIS">Melhoria IRIS</option>
+            <option value="Melhoria Genesys">Melhoria Genesys</option>
+            <option value="Erro de Integração">Erro de Integração</option>
+            <option value="Erro no Fechamento">Erro no Fechamento</option>
+            <option value="Cadastro Estabelecimento">Cadastro Estabelecimento</option>
+            <option value="Treinamento Fornecedor">Treinamento Fornecedor</option>
+            <option value="Treinamento Solicitante">Treinamento Solicitante</option>
+          </select>
         </div>
 
         <div class="form-field">
           <label for="assunto">Assunto do chamado</label>
           <input type="text" id="assunto" name="assunto" required />
+        </div>
+
+        <!-- NOVO: Urgência -->
+        <div class="form-field">
+          <label for="urgencia">Urgência</label>
+          <select id="urgencia" name="urgencia" required>
+            <option value="">Selecione...</option>
+            <option value="Vermelho - MUITO GRAVE">Vermelho - MUITO GRAVE</option>
+            <option value="Laranja - Resolução para hoje Entre 09h as 17h">
+              Laranja - Resolução para hoje Entre 09h as 17h
+            </option>
+            <option value="Amarelo - Até 3 dias">Amarelo - Até 3 dias</option>
+            <option value="Verde - Até 10 dias">Verde - Até 10 dias</option>
+            <option value="Azul - Demanda Agendada">Azul - Demanda Agendada</option>
+          </select>
         </div>
 
         <div class="form-field full-width">
@@ -100,8 +126,16 @@
     </div>
   </div>
 
+  <!-- LOADING GLOBAL -->
+  <div id="globalLoading" class="loading-overlay hidden">
+    <div class="loading-backdrop"></div>
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Processando seu chamado, por favor aguarde...</p>
+    </div>
+  </div>
+
   <!-- Firebase + lógica -->
   <script type="module" src="js/index.js"></script>
 </body>
 </html>
-
