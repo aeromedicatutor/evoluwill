@@ -3,7 +3,7 @@
    ========================= */
 :root {
   --color-bg: #ffffff;
-  --color-bg-soft: #e2e2e2;
+  --color-bg-soft: #eaffd7;
   --color-primary: #ee8207;      /* verde escuro */
   --color-primary-soft: #d17600;
   --color-accent: #4eb439;       /* laranja fogo */
@@ -915,4 +915,5 @@ textarea#modalDescricao {
     align-items: stretch;
   }
 }
+
 
