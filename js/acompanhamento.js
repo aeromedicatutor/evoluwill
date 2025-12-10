@@ -323,7 +323,10 @@ function abrirModalAcompanhamento(chamado) {
   acompanharDescricaoDiv.textContent = chamado.descricao || "-";
 
   // Status
-  aplicarClasseStatus(acompanharStatusSpan, chamado.status || "Em Espera");
+  // Status
+  const status = chamado.status || "Em Espera"; // Garante que o status seja "Em Espera" caso não esteja definido
+  acompanharStatusSpan.textContent = status; // Aqui, define o nome do status
+  aplicarClasseStatus(acompanharStatusSpan, status); // Aplica a classe que corresponde ao status
 
   // Urgência
   const urgenciaTexto = chamado.urgencia || "-";

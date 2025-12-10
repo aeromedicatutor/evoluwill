@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>Painel de Chamados - Admin</title>
+  <meta charset="UTF-8">
+  <title>Admin Evoluwill</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=BBH+Bartle&display=swap" rel="stylesheet"> <!-- Certifique-se de que o link está correto -->
+  <link rel="icon" href="img/Ellipse 1.png" type="img/icon">
 </head>
 <body class="page-light">
   <header class="app-header">
     <div class="app-header-inner">
-      <div class="logo">Evoluwill</div>
+      <div class="logo">
+          <div class="logo-nome"><h1>Evoluwill</h1></div>
+      </div>
       <nav class="top-nav">
         <a href="admin.html" class="nav-link active">Painel ADM</a>
         <a href="relatorios.html" class="nav-link">Relatórios</a>
+        <button id="btnExportar">Exportar Chamados (CSV)</button>
       </nav>
     </div>
   </header>
@@ -21,7 +28,7 @@
     <!-- Coluna de Chamados -->
     <section class="column">
       <header class="section-header">
-        <h1>Painel de Chamados</h1>
+        <h1>PAINEL DE CHAMADOS</h1>
         <div class="section-actions">
           <span class="badge" id="totalChamadosBadge">0 chamados</span>
           <!-- NOVO: contagem por nome filtrado -->
@@ -251,5 +258,7 @@
   </div>
 
   <script type="module" src="js/admin.js"></script>
+  <!-- Carrega o script que faz a exportação -->
+  <script type="module" src="js/exportar.js"></script>s
 </body>
 </html>
