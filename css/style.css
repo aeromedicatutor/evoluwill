@@ -50,6 +50,7 @@ html, body {
 .app-header {
   background: #0c7526;               /* ou var(--color-surface) */
   border-bottom: 1px solid #0c351d;
+  border-radius: 150px;
 }
 
 .app-header-inner {
@@ -915,5 +916,3 @@ textarea#modalDescricao {
     align-items: stretch;
   }
 }
-
-
