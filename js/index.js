@@ -101,12 +101,18 @@ simpleAlertCloseBtn?.addEventListener("click", fecharAlertaSimples);
 
 function mostrarFeedbackSucesso(protocolo) {
   if (!feedbackModal) return;
+
   feedbackIcon.textContent = "✔️";
   feedbackTitle.textContent = "Chamado enviado com sucesso!";
+
   feedbackMessage.innerHTML =
     'Seu protocolo é <strong id="feedbackProtocolo"></strong>. ' +
     "Guarde este número para acompanhar o chamado.";
-  feedbackProtocoloSpan.textContent = protocolo;
+
+  // IMPORTANTE: pega o elemento novamente depois do innerHTML
+  const protocoloEl = feedbackMessage.querySelector("#feedbackProtocolo");
+  if (protocoloEl) protocoloEl.textContent = protocolo;
+
   feedbackModal.classList.remove("hidden");
 }
 

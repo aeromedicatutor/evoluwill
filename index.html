@@ -16,6 +16,16 @@
   <header class="app-header">
     <div class="app-header-inner">
       <div class="logo-nome-index">EVOLUWILL</div>
+        <!-- ECG decorativo (batimentos) -->
+    <div class="header-ecg" aria-hidden="true">
+      <svg viewBox="0 0 520 60" role="presentation" focusable="false">
+        <path class="ecg-path ecg-track" d="M0 30 L60 30 L80 30 L95 30 L110 30 L125 30 L140 30 L160 30 L180 30 L200 30 L220 30 L240 30 L260 30 L280 30 L300 30 L320 30 L340 30 L360 30 L380 30 L400 30 L420 30 L440 30 L460 30 L520 30" />
+        <g class="ecg-move">
+          <path class="ecg-path" d="M0 30 L55 30 L70 30 L82 10 L94 50 L108 22 L120 30 L160 30 L175 30 L187 18 L198 42 L212 30 L260 30 L315 30 L330 30 L342 10 L354 50 L368 22 L380 30 L520 30" />
+          <path class="ecg-path" d="M520 30 L575 30 L590 30 L602 10 L614 50 L628 22 L640 30 L680 30 L695 30 L707 18 L718 42 L732 30 L780 30 L835 30 L850 30 L862 10 L874 50 L888 22 L900 30 L1040 30" />
+        </g>
+      </svg>
+    </div>
       <nav class="top-nav">
         <a href="index.html" class="nav-link active">Abrir Chamado</a>
         <a href="acompanhamento.html" class="nav-link">Acompanhar Chamado</a>
@@ -73,15 +83,12 @@
           <select id="urgencia" name="urgencia" required>
             <option value="">Selecione...</option>
             <option value="Vermelho - MUITO GRAVE">Vermelho - MUITO GRAVE</option>
-            <option value="Laranja - Resolução para hoje Entre 09h as 17h">
-              Laranja - Resolução para hoje Entre 09h as 17h
-            </option>
-            <option value="Amarelo - Até 3 dias">Amarelo - Até 2 dias</option>
+            <option value="Laranja - Resolução para hoje Entre 09h as 17h">Laranja - Resolução para hoje Entre 09h as 17h</option>
+            <option value="Amarelo - Até 2 dias">Amarelo - Até 2 dias</option>
             <option value="Verde - Até 10 dias">Verde - Até 10 dias</option>
             <option value="Azul - Demanda Agendada">Azul - Demanda Agendada</option>
           </select>
         </div>
-
         <div class="form-field full-width">
           <label for="descricao">Descrição do problema</label>
           <textarea id="descricao" name="descricao" rows="4" required></textarea>

@@ -890,6 +890,151 @@ textarea#modalDescricao {
   color: #135b9c;
 }
 
+/* =========================
+   HEADER (barra + onda + ecg) - V2
+   ========================= */
+.app-header {
+  position: relative;
+  background: #0f6f2a;
+  border-radius: 999px;
+  margin: 14px auto;
+  max-width: 1320px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+  overflow: hidden;
+}
+
+.app-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  /* altura mais “premium” */
+  height: 78px;
+  padding: 0 22px;
+
+  position: relative;
+  z-index: 2;
+}
+
+/* Logo não “encosta” e não corta */
+.app-header .logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 240px;
+}
+.logo-nome h1,
+.logo-nome-index h1 {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: 0.6px;
+  color: #ffffff;
+}
+
+/* ECG centralizado e com recorte (para não virar linha reta gigante) */
+.header-ecg {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 220px;
+  height: 100%;
+  padding: 0 10px;
+
+  /* isso “corta” o ECG para ele ficar só no miolo e elegante */
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
+}
+
+.header-ecg svg {
+  width: min(560px, 100%);
+  height: 46px;
+  display: block;
+}
+
+.header-ecg .ecg-path {
+  fill: none;
+  stroke: #ff7a00;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 2px 0 rgba(0,0,0,0.25));
+}
+
+.header-ecg .ecg-move {
+  animation: ecg-slide 1.8s linear infinite;
+}
+@keyframes ecg-slide {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-260px); }
+}
+
+/* NAV à direita mais alinhado */
+.app-header nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 260px;
+  justify-content: flex-end;
+}
+.app-header nav a,
+.app-header nav button {
+  border-radius: 999px;
+}
+
+/* Onda branca embaixo: menor, suave e sem “bloco” */
+.app-header::after {
+  content: "";
+  position: absolute;
+  left: -6%;
+  right: -6%;
+  bottom: -24px;
+
+  height: 52px;
+  background: #ffffff;
+
+  /* curva mais controlada */
+  border-top-left-radius: 60% 100%;
+  border-top-right-radius: 60% 100%;
+
+  /* leve “sombra” para separar do verde */
+  box-shadow: 0 -1px 0 rgba(0,0,0,0.08);
+  z-index: 1;
+}
+
+/* Mobile: some ECG, mantém bonito e limpo */
+@media (max-width: 720px) {
+  .app-header {
+    border-radius: 26px;
+  }
+  .app-header-inner {
+    height: 84px;
+    padding: 0 16px;
+  }
+  .header-ecg {
+    display: none;
+  }
+  .app-header .logo {
+    min-width: auto;
+  }
+  nav {
+    min-width: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .logo-nome-index h1,
+  .logo-nome h1 {
+    font-size: 26px;
+  }
+  .header-ecg {
+    display: none; /* em telas muito pequenas, prioriza navegação */
+  }
+}
+
+
 /* RESPONSIVO */
 @media (max-width: 860px) {
   .admin-layout {

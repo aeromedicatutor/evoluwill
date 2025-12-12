@@ -1,0 +1,323 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ----------------------------
+    // Funções auxiliares
+    // ----------------------------
+
+    // Está logado?
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // É ADMIN? (custom claim: admin = true)
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    // Lista de status válidos para o sistema
+    function isValidStatus(status) {
+      return status == "Em Espera" ||
+             status == "Em atendimento" ||
+             status == "Resolvido" ||
+             status == "Cancelado" ||
+             status == "Verificando com a GTI" ||
+             status == "Em Produção";
+    }
+
+    // Lista de categorias válidas
+    function isValidCategoria(categoria) {
+      return categoria == "Melhoria Dedalus" ||
+             categoria == "Melhoria IRIS" ||
+             categoria == "Melhoria Genesys" ||
+             categoria == "Erro de Integração" ||
+             categoria == "Erro de App Token" ||
+             categoria == "Erro no Fechamento" ||
+             categoria == "Cadastro Estabelecimento" ||
+             categoria == "Treinamento Fornecedor" ||
+             categoria == "Treinamento Solicitante" ||
+             categoria == "Fornecedor com dificuldade" ||
+             categoria == "Agendamento" ||
+             categoria == "Dúvidas";
+             
+    }
+
+    // Lista de urgências válidas
+    function isValidUrgencia(urgencia) {
+      return urgencia == "Vermelho - MUITO GRAVE" ||
+             urgencia == "Laranja - Resolução para hoje Entre 09h as 17h" ||
+             urgencia == "Amarelo - Até 2 dias" ||
+             urgencia == "Verde - Até 10 dias" ||
+             urgencia == "Azul - Demanda Agendada";
+    }
+
+    // ----------------------------
+    // Validação de CREATE em "chamados"
+    // (formulário público)
+    // ----------------------------
+    function isValidChamadoCreate() {
+      // Permitimos apenas os campos usados no front:
+      // - NOVO MODELO (sem telefone + categoria + urgencia)
+      // - Campos de anexo: anexoNome, anexoTipo, anexoBase64 (opcionais)
+      //
+      // Observação: se você ainda tiver chamados legados com "telefone"
+      // isso não afeta as regras de CREATE (apenas docs antigos já existentes).
+      return
+        request.resource.data.keys().hasOnly([
+          "protocolo",
+          "createdAt",
+          "updatedAt",
+          "status",
+          "nome",
+          "categoria",
+          "assunto",
+          "urgencia",
+          "descricao",
+          "anexoNome",
+          "anexoTipo",
+          "anexoBase64"
+        ])
+
+        // Tipos obrigatórios
+        && request.resource.data.protocolo is string
+        && request.resource.data.nome is string
+        && request.resource.data.categoria is string
+        && request.resource.data.assunto is string
+        && request.resource.data.urgencia is string
+        && request.resource.data.descricao is string
+        && request.resource.data.status is string
+        && request.resource.data.createdAt is timestamp
+
+        // updatedAt pode ou não existir na criação
+        && (
+          !("updatedAt" in request.resource.data) ||
+          request.resource.data.updatedAt == null ||
+          request.resource.data.updatedAt is timestamp
+        )
+
+        // Valores esperados
+        && request.resource.data.status == "Em Espera"
+        && isValidCategoria(request.resource.data.categoria)
+        && isValidUrgencia(request.resource.data.urgencia)
+
+        // Limites de tamanho (sanidade básica)
+        && request.resource.data.protocolo.size() > 0
+        && request.resource.data.protocolo.size() <= 40
+        && request.resource.data.nome.size() > 0
+        && request.resource.data.nome.size() <= 200
+        && request.resource.data.assunto.size() > 0
+        && request.resource.data.assunto.size() <= 200
+        && request.resource.data.descricao.size() > 0
+        && request.resource.data.descricao.size() <= 4000
+
+        // Campos de anexo NOVOS (base64) podem ser null ou string
+        && (
+          !("anexoNome" in request.resource.data) ||
+          request.resource.data.anexoNome == null ||
+          request.resource.data.anexoNome is string
+        )
+        && (
+          !("anexoTipo" in request.resource.data) ||
+          request.resource.data.anexoTipo == null ||
+          request.resource.data.anexoTipo is string
+        )
+        && (
+          !("anexoBase64" in request.resource.data) ||
+          request.resource.data.anexoBase64 == null ||
+          (
+            request.resource.data.anexoBase64 is string &&
+            request.resource.data.anexoBase64.size() <= 1000000 // ~1MB
+          )
+        );
+    }
+
+    // ----------------------------
+    // Usuário final só pode CANCELAR o chamado
+    // (atualizar status -> "Cancelado")
+    // ----------------------------
+    function isPublicCancelUpdate() {
+      let diff = resource.data.diff(request.resource.data);
+
+      return
+        // Só pode mudar status e, opcionalmente, updatedAt
+        diff.changedKeys().hasOnly(["status", "updatedAt"]) &&
+
+        // Status deve virar "Cancelado"
+        request.resource.data.status == "Cancelado" &&
+
+        // Não pode "ressuscitar" chamado já resolvido/cancelado
+        resource.data.status != "Cancelado" &&
+        resource.data.status != "Resolvido" &&
+
+        // updatedAt é opcional, mas se vier deve ser timestamp
+        (
+          !("updatedAt" in request.resource.data) ||
+          request.resource.data.updatedAt == null ||
+          request.resource.data.updatedAt is timestamp
+        );
+    }
+
+    // ----------------------------
+    // Update feito pelo painel ADM (sem autenticação, DEV MODE)
+    // ----------------------------
+    function isDevAdminPanelUpdate() {
+      let diff = resource.data.diff(request.resource.data);
+      let newStatus = request.resource.data.status;
+
+      // ADM pode mudar:
+      // - status
+      // - nome
+      // - categoria
+      // - urgencia
+      // - assunto
+      // - descricao
+      // - updatedAt
+      return
+        diff.changedKeys().hasOnly(
+          ["status", "nome", "categoria", "urgencia", "assunto", "descricao", "updatedAt"]
+        )
+
+        // Tipos básicos
+        && request.resource.data.status is string
+        && request.resource.data.nome is string
+        && request.resource.data.categoria is string
+        && request.resource.data.urgencia is string
+        && request.resource.data.assunto is string
+        && request.resource.data.descricao is string
+
+        // updatedAt obrigatório no update do painel ADM
+        && request.resource.data.updatedAt is timestamp
+
+        // Valores permitidos
+        && isValidStatus(newStatus)
+        && isValidCategoria(request.resource.data.categoria)
+        && isValidUrgencia(request.resource.data.urgencia)
+
+        // Limites razoáveis
+        && request.resource.data.nome.size() > 0
+        && request.resource.data.nome.size() <= 200
+        && request.resource.data.assunto.size() > 0
+        && request.resource.data.assunto.size() <= 200
+        && request.resource.data.descricao.size() > 0
+        && request.resource.data.descricao.size() <= 4000;
+    }
+
+    // ----------------------------
+    // Coleção: chamados
+    // ----------------------------
+    match /chamados/{chamadoId} {
+
+      // Criar chamado: formulário público
+      allow create: if isValidChamadoCreate();
+
+      // Ler chamado: público e ADM
+      allow read: if true;
+
+      // Atualizar:
+      // - Público: pode cancelar (status -> Cancelado)
+      // - ADM (dev, sem login): pode editar campos do painel
+      // - Futuro: quando tiver login, trocar para (isAdmin() && isDevAdminPanelUpdate())
+      allow update: if
+        isPublicCancelUpdate() ||
+        isDevAdminPanelUpdate() ||
+        // Caso você já use auth com custom claims de admin:
+        (isAdmin() && isDevAdminPanelUpdate());
+
+      // Deletar:
+      // - DEV: libera para o painel ADM funcionar
+      // - Prod depois: trocar para if isAdmin();
+      allow delete: if true;
+    }
+
+    // ----------------------------
+    // Coleção: logs
+    // ----------------------------
+    match /logs/{logId} {
+
+      // Qualquer cliente pode criar log (USUARIO ou ADM)
+      allow create: if
+        request.resource.data.keys().hasOnly([
+          "type",
+          "chamadoId",
+          "actorType",
+          "details",
+          "createdAt"
+        ])
+        && request.resource.data.type is string
+        && (request.resource.data.chamadoId == null
+            || request.resource.data.chamadoId is string)
+        && request.resource.data.actorType is string
+        && request.resource.data.details is string
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.type.size() <= 100
+        && request.resource.data.actorType.size() <= 20
+        && request.resource.data.details.size() <= 4000;
+
+      // DEV: leitura liberada para todo mundo
+      // Prod depois: allow read: if isAdmin();
+      allow read: if true;
+
+      // Ninguém altera ou apaga log pelo front
+      allow update, delete: if false;
+    }
+
+    // ----------------------------
+    // Coleção: comentarios (chat ADM/Usuário)
+    // ----------------------------
+    match /comentarios/{comentarioId} {
+
+      // CREATE: usado tanto pelo Usuário quanto pelo ADM
+      allow create: if
+        request.resource.data.keys().hasOnly([
+          "chamadoId",
+          "protocolo",
+          "autorTipo",
+          "origem",
+          "mensagem",
+          "createdAt",
+          "lidoPeloUsuario",
+          "lidoPeloAdm"
+        ])
+        && request.resource.data.chamadoId is string
+        && (request.resource.data.protocolo == null
+            || request.resource.data.protocolo is string)
+        && request.resource.data.autorTipo is string
+        && (request.resource.data.autorTipo == "ADM"
+            || request.resource.data.autorTipo == "USUARIO")
+        && request.resource.data.origem is string
+        && request.resource.data.mensagem is string
+        && request.resource.data.mensagem.size() > 0
+        && request.resource.data.mensagem.size() <= 2000
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.lidoPeloUsuario is bool
+        && request.resource.data.lidoPeloAdm is bool;
+
+      // READ: necessário para o "chat" em tempo real
+      allow read: if true;
+
+      // Ninguém altera ou apaga comentários pelo front
+      allow update, delete: if false;
+    }
+
+    // ----------------------------
+    // Coleção: config (contador de protocolos)
+    // ----------------------------
+    match /config/{docId} {
+      // leitura liberada (pode fechar depois)
+      allow read: if true;
+
+      // Modo DEV:
+      // - antigo: "contadorChamados"
+      // - novo:  "contadorChamados-AAAA" (um doc por ano)
+      allow write: if
+        docId == "contadorChamados" ||
+        docId.matches("^contadorChamados-\\d{4}$");
+    }
+
+    // Bloqueia qualquer outra coleção/doc
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

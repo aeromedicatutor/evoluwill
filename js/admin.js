@@ -21,7 +21,8 @@ import {
   doc,
   updateDoc,
   deleteDoc,
-  getDocs
+  getDocs,
+  serverTimestamp
 } from "./firebase-config.js";
 import {
   criarLog,
@@ -309,7 +310,7 @@ modalSalvarBtn?.addEventListener("click", async () => {
       urgencia: novaUrgencia,
       assunto: novoAssunto,
       descricao: novaDescricao,
-      updatedAt: new Date()
+      updatedAt: serverTimestamp()
     });
 
     console.log("Chamado atualizado:", chamadoSelecionado.protocolo);
