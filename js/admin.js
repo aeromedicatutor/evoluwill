@@ -174,13 +174,18 @@ function renderizarChamados() {
 
   if (filtrados.length === 0) {
     containerChamados.innerHTML =
-      '<p class="small muted">Nenhum chamado encontrado com os filtros atuais.</p>';
+      '<div class="empty-state"><span class="empty-state-icon">🔍</span><div class="empty-state-title">Nenhum chamado encontrado</div><div class="empty-state-sub">Tente ajustar os filtros de busca</div></div>';
     return;
   }
 
   filtrados.forEach((c) => {
     const card = document.createElement("article");
     card.className = "ticket-card";
+    // Add data attributes for stats counter
+    const urgencyKey = (c.urgencia || "").split(" ")[0].toLowerCase();
+    card.dataset.urgency = urgencyKey;
+    const statusKey = (c.status || "").toLowerCase().replace(/\s+/g, "-").replace(/[^a-z-]/g, "");
+    card.dataset.status = statusKey;
 
     const header = document.createElement("div");
     header.className = "ticket-header";
@@ -251,6 +256,13 @@ function abrirModalDetalhe(chamado) {
   chamadoSelecionado = chamado;
 
   modalProtocoloSpan.textContent = chamado.protocolo || "";
+  // Update urgencia badge in modal header
+  const urgBadge = document.getElementById("modalUrgenciaBadge");
+  if (urgBadge && chamado.urgencia) {
+    const u = chamado.urgencia.split(" ")[0].toLowerCase();
+    urgBadge.className = "urgency-pill urgency-" + u;
+    urgBadge.textContent = chamado.urgencia.split(" ")[0];
+  }
   modalDataAberturaSpan.textContent = formatarDataHora(chamado.createdAt);
   modalTempoAberturaSpan.textContent = calcularTempoAbertura(chamado.createdAt);
   modalStatusSelect.value = chamado.status || "Em Espera";
