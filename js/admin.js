@@ -174,7 +174,7 @@ function renderizarChamados() {
 
   if (filtrados.length === 0) {
     containerChamados.innerHTML =
-      '<div class="empty-state"><span class="empty-state-icon">🔍</span><div class="empty-state-title">Nenhum chamado encontrado</div><div class="empty-state-sub">Tente ajustar os filtros de busca</div></div>';
+      '<div class="empty-state"><div class="empty-state-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div><div class="empty-state-title">Nenhum chamado encontrado</div><div class="empty-state-sub">Tente ajustar os filtros de busca</div></div>';
     return;
   }
 
@@ -234,10 +234,13 @@ function renderizarChamados() {
     footer.appendChild(tempoSpan);
     footer.appendChild(metaRight);
 
-    card.appendChild(header);
-    card.appendChild(titulo);
-    card.appendChild(subtitle);
-    card.appendChild(footer);
+    const inner = document.createElement("div");
+    inner.className = "ticket-inner";
+    inner.appendChild(header);
+    inner.appendChild(titulo);
+    inner.appendChild(subtitle);
+    inner.appendChild(footer);
+    card.appendChild(inner);
 
     card.addEventListener("click", () => abrirModalDetalhe(c));
 
