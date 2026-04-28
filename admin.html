@@ -1,370 +1,407 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <title>EVOLUWILL — Painel Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="icon" href="img/Ellipse 1.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="icon" href="img/Ellipse 1.png" type="image/png"/>
 </head>
-
 <body class="page-light">
 
-  <!-- ── HEADER ───────────────────────────────────────────── -->
-  <header class="app-header">
-    <div class="app-header-inner">
-      <div class="logo-nome">
-        <div class="logo-mark">EW</div>
-        <span class="logo-text">EVOLUWILL</span>
-        <span style="background:rgba(255,255,255,0.15);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;margin-left:4px;letter-spacing:0.06em;">ADMIN</span>
-      </div>
+<!-- SVG SPRITE (same as index.html - abbreviated for space, use full in prod) -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="ic-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+  <symbol id="ic-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="ic-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="ic-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
+  <symbol id="ic-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+  <symbol id="ic-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="ic-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+  <symbol id="ic-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></symbol>
+  <symbol id="ic-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></symbol>
+  <symbol id="ic-message" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="ic-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+  <symbol id="ic-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></symbol>
+  <symbol id="ic-log" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></symbol>
+  <symbol id="ic-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+  <symbol id="ic-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></symbol>
+  <symbol id="ic-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="ic-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+</svg>
 
-      <!-- ECG -->
-      <div class="header-ecg" aria-hidden="true">
-        <svg viewBox="0 0 520 60" role="presentation" focusable="false">
-          <path class="ecg-path" style="opacity:0.25" d="M0 30 L520 30" />
-          <g class="ecg-move">
-            <path class="ecg-path" d="M0 30 L55 30 L70 30 L82 10 L94 50 L108 22 L120 30 L160 30 L175 30 L187 18 L198 42 L212 30 L260 30 L315 30 L330 30 L342 10 L354 50 L368 22 L380 30 L520 30" />
-            <path class="ecg-path" d="M520 30 L575 30 L590 30 L602 10 L614 50 L628 22 L640 30 L680 30 L695 30 L707 18 L718 42 L732 30 L780 30 L835 30 L850 30 L862 10 L874 50 L888 22 L900 30 L1040 30" />
-          </g>
-        </svg>
-      </div>
-
-      <nav class="top-nav">
-        <a href="admin.html" class="nav-link active">Painel ADM</a>
-        <a href="relatorios.html" class="nav-link">Relatórios</a>
-        <button id="btnExportar" class="nav-btn">⬇ Exportar CSV</button>
-      </nav>
+<!-- ── HEADER ─────────────────────────────── -->
+<header class="app-header">
+  <div class="app-header-inner">
+    <div class="logo-nome">
+      <div class="logo-mark"><svg><use href="#ic-pulse"/></svg></div>
+      <span class="logo-text">EVOLUWILL</span>
+      <span class="admin-badge">Admin</span>
     </div>
-  </header>
+    <div class="header-ecg" aria-hidden="true">
+      <svg viewBox="0 0 520 60" role="presentation" focusable="false">
+        <path class="ecg-track" d="M0 30 L520 30"/>
+        <g class="ecg-move">
+          <path class="ecg-path" d="M0 30 L55 30 L70 30 L82 10 L94 50 L108 22 L120 30 L160 30 L175 30 L187 18 L198 42 L212 30 L260 30 L315 30 L330 30 L342 10 L354 50 L368 22 L380 30 L520 30"/>
+          <path class="ecg-path" d="M520 30 L575 30 L590 30 L602 10 L614 50 L628 22 L640 30 L680 30 L695 30 L707 18 L718 42 L732 30 L780 30 L835 30 L850 30 L862 10 L874 50 L888 22 L900 30 L1040 30"/>
+        </g>
+      </svg>
+    </div>
+    <nav class="top-nav">
+      <a href="admin.html" class="nav-link active">Painel</a>
+      <a href="relatorios.html" class="nav-link">Relatórios</a>
+      <button id="btnExportar" class="nav-btn">
+        <svg><use href="#ic-download"/></svg>
+        Exportar CSV
+      </button>
+    </nav>
+  </div>
+</header>
 
-  <!-- ── MAIN ─────────────────────────────────────────────── -->
-  <main class="main-container">
+<!-- ── MAIN ───────────────────────────────── -->
+<main class="main-container">
 
-    <!-- Stats Row -->
-    <div class="stats-grid" id="statsGrid">
-      <div class="stat-card">
-        <div class="stat-icon stat-icon-orange">⏳</div>
-        <div class="stat-body">
-          <div class="stat-value" id="statEspera">0</div>
-          <div class="stat-label">Em Espera</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon stat-icon-blue">🔵</div>
-        <div class="stat-body">
-          <div class="stat-value" id="statAtendimento">0</div>
-          <div class="stat-label">Em Atendimento</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon stat-icon-green">✅</div>
-        <div class="stat-body">
-          <div class="stat-value" id="statResolvido">0</div>
-          <div class="stat-label">Resolvidos</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon stat-icon-red">🔴</div>
-        <div class="stat-body">
-          <div class="stat-value" id="statUrgente">0</div>
-          <div class="stat-label">Urgência Alta</div>
-        </div>
+  <!-- Stats -->
+  <div class="stats-grid animate-in">
+    <div class="stat-card stat-amber">
+      <div class="stat-icon stat-icon-amber"><svg><use href="#ic-inbox"/></svg></div>
+      <div class="stat-body">
+        <div class="stat-value" id="statEspera">0</div>
+        <div class="stat-label">Em Espera</div>
       </div>
     </div>
+    <div class="stat-card stat-blue">
+      <div class="stat-icon stat-icon-blue"><svg><use href="#ic-activity"/></svg></div>
+      <div class="stat-body">
+        <div class="stat-value" id="statAtendimento">0</div>
+        <div class="stat-label">Em Atendimento</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon-green"><svg><use href="#ic-check-circle"/></svg></div>
+      <div class="stat-body">
+        <div class="stat-value" id="statResolvido">0</div>
+        <div class="stat-label">Resolvidos</div>
+      </div>
+    </div>
+    <div class="stat-card stat-red">
+      <div class="stat-icon stat-icon-red"><svg><use href="#ic-alert"/></svg></div>
+      <div class="stat-body">
+        <div class="stat-value" id="statUrgente">0</div>
+        <div class="stat-label">Urgência Alta</div>
+      </div>
+    </div>
+  </div>
 
-    <!-- Two-column layout -->
-    <div class="admin-layout">
-
-      <!-- ── LEFT: Chamados ────────────────────────────────── -->
-      <section>
-        <!-- Toolbar -->
-        <div class="section-header">
-          <div>
-            <div class="section-title">Chamados</div>
-          </div>
-          <div class="section-actions">
-            <span class="badge badge-green" id="totalChamadosBadge">0 chamados</span>
-            <span class="badge badge-gray" id="contagemNomeBadge" style="display:none;"></span>
-          </div>
+  <div class="admin-layout">
+    <!-- Chamados -->
+    <section class="animate-in animate-in-1">
+      <div class="section-header">
+        <div class="section-title">Chamados</div>
+        <div class="section-actions">
+          <span class="badge badge-green" id="totalChamadosBadge">0 chamados</span>
+          <span class="badge badge-gray" id="contagemNomeBadge" style="display:none;"></span>
         </div>
-
-        <div class="toolbar">
-          <div class="toolbar-search">
-            <span class="toolbar-search-icon">🔍</span>
-            <input type="text" id="buscaTexto" placeholder="Buscar por nome ou assunto…" />
-          </div>
-          <input type="text" id="filtroNome" class="input-pill" style="min-width:160px;" placeholder="Filtrar por nome" />
-          <select id="statusFiltro" class="filter-select">
-            <option value="TODOS">Todos os status</option>
-            <option value="Em Espera">Em Espera</option>
-            <option value="Em atendimento">Em atendimento</option>
-            <option value="Resolvido">Resolvido</option>
-            <option value="Cancelado">Cancelado</option>
-            <option value="Verificando com a GTI">Verificando c/ GTI</option>
-            <option value="Em Produção">Em Produção</option>
-          </select>
+      </div>
+      <div class="toolbar">
+        <div class="toolbar-search">
+          <span class="toolbar-search-icon"><svg><use href="#ic-search"/></svg></span>
+          <input type="text" id="buscaTexto" placeholder="Buscar por nome, assunto ou protocolo…" autocomplete="off"/>
         </div>
-
-        <div id="chamadosContainer" class="cards-grid">
-          <div class="empty-state">
-            <span class="empty-state-icon">📋</span>
-            <div class="empty-state-title">Carregando chamados…</div>
-          </div>
+        <input type="text" id="filtroNome" class="input-pill" style="min-width:150px;" placeholder="Filtrar por nome"/>
+        <select id="statusFiltro" class="filter-select">
+          <option value="TODOS">Todos os status</option>
+          <option value="Em Espera">Em Espera</option>
+          <option value="Em atendimento">Em atendimento</option>
+          <option value="Resolvido">Resolvido</option>
+          <option value="Cancelado">Cancelado</option>
+          <option value="Verificando com a GTI">Verificando c/ GTI</option>
+          <option value="Em Produção">Em Produção</option>
+        </select>
+      </div>
+      <div id="chamadosContainer" class="cards-grid">
+        <div class="empty-state">
+          <div class="empty-state-icon"><svg><use href="#ic-inbox"/></svg></div>
+          <div class="empty-state-title">Carregando chamados…</div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- ── RIGHT: Logs ───────────────────────────────────── -->
-      <aside>
-        <div class="card logs-card">
-          <div class="card-header" style="padding-bottom:16px;border-bottom:1px solid var(--color-border);">
+    <!-- Logs -->
+    <aside class="animate-in animate-in-2">
+      <div class="card logs-card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <div class="card-icon card-icon-green"><svg><use href="#ic-log"/></svg></div>
             <div class="card-title">Logs do Sistema</div>
           </div>
-
-          <div class="logs-filter-row">
-            <div>
-              <label>De:</label>
-              <input type="datetime-local" id="logDataInicio" class="datetime-input" />
-            </div>
-            <div>
-              <label>Até:</label>
-              <input type="datetime-local" id="logDataFim" class="datetime-input" />
-            </div>
-            <button id="filtrarLogsBtn" class="btn btn-secondary btn-sm" style="margin-top:4px;">Filtrar</button>
-          </div>
-
-          <div class="logs-table-wrapper">
-            <table class="logs-table">
-              <thead>
-                <tr>
-                  <th>Data/Hora</th>
-                  <th>Ação</th>
-                  <th>ID</th>
-                  <th>Ator</th>
-                </tr>
-              </thead>
-              <tbody id="logsTableBody">
-                <tr>
-                  <td colspan="4" style="text-align:center;color:var(--gray-400);padding:20px;">
-                    Nenhum log registrado
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
         </div>
-      </aside>
-    </div>
-  </main>
-
-  <!-- ── MODAL DETALHES DO CHAMADO ────────────────────────── -->
-  <div id="detalheChamadoModal" class="modal-overlay hidden">
-    <div class="modal modal-large">
-
-      <div class="modal-header">
-        <div class="modal-header-left">
-          <span class="protocol-pill" id="modalProtocolo">CH-0000</span>
-          <span id="modalUrgenciaBadge" class="urgency-pill" style="margin-left:4px;"></span>
+        <div class="logs-filter">
+          <div class="logs-filter-title">Filtrar por período</div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:var(--slate-500);display:block;margin-bottom:4px;">De</label>
+            <input type="datetime-local" id="logDataInicio" class="datetime-input"/>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:var(--slate-500);display:block;margin-bottom:4px;">Até</label>
+            <input type="datetime-local" id="logDataFim" class="datetime-input"/>
+          </div>
+          <button id="filtrarLogsBtn" class="btn btn-secondary btn-sm" style="width:100%;">
+            <svg><use href="#ic-filter"/></svg>
+            Aplicar filtro
+          </button>
         </div>
-        <button class="modal-close-btn" id="detalheFecharBtn">✕</button>
+        <div class="logs-table-wrapper">
+          <table class="logs-table">
+            <thead>
+              <tr>
+                <th>Data/Hora</th>
+                <th>Ação</th>
+                <th>ID</th>
+                <th>Ator</th>
+              </tr>
+            </thead>
+            <tbody id="logsTableBody">
+              <tr><td colspan="4" style="text-align:center;color:var(--slate-400);padding:20px 14px;">Nenhum log registrado</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+    </aside>
+  </div>
+</main>
 
-      <div class="modal-body">
+<!-- ── MODAL DETALHE ─────────────────────── -->
+<div id="detalheChamadoModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+  <div class="modal modal-large">
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <span class="protocol-pill" id="modalProtocolo">CH-0000</span>
+        <span id="modalUrgenciaBadge" class="urgency-pill"></span>
+      </div>
+      <button class="modal-close-btn" id="detalheFecharBtn" aria-label="Fechar">
+        <svg><use href="#ic-x"/></svg>
+      </button>
+    </div>
 
-        <!-- Status + Info Row -->
-        <div class="modal-section">
-          <div class="modal-section-title">Informações Gerais</div>
-          <div class="modal-grid">
-            <div class="field-row">
-              <span class="field-label">Status atual</span>
-              <select id="modalStatus" class="select-inline">
-                <option value="Em Espera">Em Espera</option>
-                <option value="Em atendimento">Em atendimento</option>
-                <option value="Resolvido">Resolvido</option>
-                <option value="Cancelado">Cancelado</option>
-                <option value="Verificando com a GTI">Verificando com a GTI</option>
-                <option value="Em Produção">Em Produção</option>
-              </select>
-            </div>
-            <div class="field-row">
-              <span class="field-label">Urgência</span>
-              <select id="modalUrgencia" class="select-inline">
-                <option value="">Selecione...</option>
-                <option value="Vermelho - MUITO GRAVE">🔴 Vermelho — MUITO GRAVE</option>
-                <option value="Laranja - Resolução para hoje Entre 09h as 17h">🟠 Laranja — Hoje até 17h</option>
-                <option value="Amarelo - Até 2 dias">🟡 Amarelo — Até 2 dias</option>
-                <option value="Verde - Até 10 dias">🟢 Verde — Até 10 dias</option>
-                <option value="Azul - Demanda Agendada">🔵 Azul — Agendado</option>
-              </select>
-            </div>
-            <div class="field-row">
-              <span class="field-label">Data de abertura</span>
-              <span class="field-value" id="modalDataAbertura">—</span>
-            </div>
-            <div class="field-row">
-              <span class="field-label">Tempo em aberto</span>
-              <span class="field-value" id="modalTempoAbertura">—</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Solicitante + Dados -->
-        <div class="modal-section">
-          <div class="modal-section-title">Dados do Solicitante</div>
-          <div class="modal-grid">
-            <div class="field-row">
-              <span class="field-label">Nome</span>
-              <input id="modalNome" class="input-inline" placeholder="Nome do solicitante" />
-            </div>
-            <div class="field-row">
-              <span class="field-label">Categoria</span>
-              <select id="modalCategoria" class="select-inline">
-                <option value="">Selecione</option>
-                <option value="Melhoria Dedalus">Melhoria Dedalus</option>
-                <option value="Melhoria IRIS">Melhoria IRIS</option>
-                <option value="Melhoria Genesys">Melhoria Genesys</option>
-                <option value="Erro de Integração">Erro de Integração</option>
-                <option value="Erro de App Token">Erro de App Token</option>
-                <option value="Erro no Fechamento">Erro no Fechamento</option>
-                <option value="Cadastro Estabelecimento">Cadastro Estabelecimento</option>
-                <option value="Treinamento Fornecedor">Treinamento Fornecedor</option>
-                <option value="Treinamento Solicitante">Treinamento Solicitante</option>
-                <option value="Fornecedor com dificuldade">Fornecedor com dificuldade</option>
-                <option value="Agendamento">Agendamento</option>
-                <option value="Dúvidas">Dúvidas</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- Assunto + Descrição -->
-        <div class="modal-section">
-          <div class="modal-section-title">Chamado</div>
-          <div class="field-row" style="margin-bottom:12px;">
-            <span class="field-label">Assunto</span>
-            <input id="modalAssunto" class="input-inline" placeholder="Assunto do chamado" />
+    <div class="modal-body">
+      <!-- Status & Info -->
+      <div class="modal-section">
+        <div class="modal-section-title">Situação do Chamado</div>
+        <div class="modal-grid">
+          <div class="field-row">
+            <span class="field-label">Status</span>
+            <select id="modalStatus" class="select-inline">
+              <option value="Em Espera">Em Espera</option>
+              <option value="Em atendimento">Em atendimento</option>
+              <option value="Resolvido">Resolvido</option>
+              <option value="Cancelado">Cancelado</option>
+              <option value="Verificando com a GTI">Verificando com a GTI</option>
+              <option value="Em Produção">Em Produção</option>
+            </select>
           </div>
           <div class="field-row">
-            <span class="field-label">Descrição</span>
-            <textarea id="modalDescricao" class="input-inline" rows="4" placeholder="Descrição detalhada…"></textarea>
+            <span class="field-label">Urgência</span>
+            <select id="modalUrgencia" class="select-inline">
+              <option value="">Selecione...</option>
+              <option value="Vermelho - MUITO GRAVE">Crítico — Muito Grave</option>
+              <option value="Laranja - Resolução para hoje Entre 09h as 17h">Alto — Hoje até 17h</option>
+              <option value="Amarelo - Até 2 dias">Médio — Até 2 dias</option>
+              <option value="Verde - Até 10 dias">Baixo — Até 10 dias</option>
+              <option value="Azul - Demanda Agendada">Agendado</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Aberto em</span>
+            <span class="field-value" id="modalDataAbertura">—</span>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Tempo em aberto</span>
+            <span class="field-value" id="modalTempoAbertura">—</span>
           </div>
         </div>
+      </div>
 
-        <!-- Anexo -->
+      <!-- Solicitante -->
+      <div class="modal-section">
+        <div class="modal-section-title">Dados do Solicitante</div>
+        <div class="modal-grid">
+          <div class="field-row">
+            <span class="field-label">Nome</span>
+            <input id="modalNome" class="input-inline" placeholder="Nome do solicitante"/>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Categoria</span>
+            <select id="modalCategoria" class="select-inline">
+              <option value="">Selecione</option>
+              <option value="Melhoria Dedalus">Melhoria Dedalus</option>
+              <option value="Melhoria IRIS">Melhoria IRIS</option>
+              <option value="Melhoria Genesys">Melhoria Genesys</option>
+              <option value="Erro de Integração">Erro de Integração</option>
+              <option value="Erro de App Token">Erro de App Token</option>
+              <option value="Erro no Fechamento">Erro no Fechamento</option>
+              <option value="Cadastro Estabelecimento">Cadastro Estabelecimento</option>
+              <option value="Treinamento Fornecedor">Treinamento Fornecedor</option>
+              <option value="Treinamento Solicitante">Treinamento Solicitante</option>
+              <option value="Fornecedor com dificuldade">Fornecedor com dificuldade</option>
+              <option value="Agendamento">Agendamento</option>
+              <option value="Dúvidas">Dúvidas</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chamado -->
+      <div class="modal-section">
+        <div class="modal-section-title">Detalhes do Chamado</div>
+        <div class="field-row" style="margin-bottom:12px;">
+          <span class="field-label">Assunto</span>
+          <input id="modalAssunto" class="input-inline" placeholder="Assunto do chamado"/>
+        </div>
         <div class="field-row">
-          <span class="field-label">Anexo</span>
-          <div id="modalAnexoContainer" class="attachment-box">—</div>
+          <span class="field-label">Descrição</span>
+          <textarea id="modalDescricao" class="input-inline" rows="4" placeholder="Descrição detalhada…"></textarea>
         </div>
+      </div>
 
-        <!-- Chat -->
-        <div class="modal-section">
-          <div class="comments-section">
-            <div class="comments-title">💬 Mensagens com o usuário</div>
-            <div id="adminCommentsList" class="comments-list"></div>
-            <div class="comments-input-row">
-              <textarea id="adminNewComment" placeholder="Escreva uma mensagem para o usuário…" rows="2"></textarea>
-              <button id="adminSendCommentBtn" class="btn btn-primary btn-sm">Enviar</button>
-            </div>
+      <!-- Anexo -->
+      <div class="field-row">
+        <span class="field-label">Anexo</span>
+        <div id="modalAnexoContainer" class="attachment-box">
+          <svg><use href="#ic-file"/></svg>
+          <span>Sem anexo</span>
+        </div>
+      </div>
+
+      <!-- Chat -->
+      <div class="modal-section">
+        <div class="comments-section">
+          <div class="comments-title">
+            <svg><use href="#ic-message"/></svg>
+            Comunicação com o usuário
+          </div>
+          <div id="adminCommentsList" class="comments-list">
+            <div class="comments-empty">Nenhuma mensagem ainda.</div>
+          </div>
+          <div class="comments-input-row">
+            <textarea id="adminNewComment" placeholder="Escreva uma mensagem para o usuário…" rows="2"></textarea>
+            <button id="adminSendCommentBtn" class="btn btn-primary btn-sm">
+              <svg><use href="#ic-send"/></svg>
+            </button>
           </div>
         </div>
-
       </div>
+    </div>
 
-      <div class="modal-footer">
-        <div class="modal-footer-left">
-          <button id="modalExcluirBtn" class="btn btn-danger btn-sm">🗑 Excluir</button>
-        </div>
-        <button class="btn btn-secondary btn-sm" id="detalheFecharBtnFooter">Cancelar</button>
-        <button id="modalSalvarBtn" class="btn btn-primary">💾 Salvar alterações</button>
+    <div class="modal-footer">
+      <div class="modal-footer-left">
+        <button id="modalExcluirBtn" class="btn btn-danger btn-sm">
+          <svg><use href="#ic-trash"/></svg>
+          Excluir
+        </button>
+      </div>
+      <button class="btn btn-secondary btn-sm" id="detalheFecharBtnFooter">Cancelar</button>
+      <button id="modalSalvarBtn" class="btn btn-primary">
+        <svg><use href="#ic-save"/></svg>
+        Salvar alterações
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modais auxiliares -->
+<div id="confirmDeleteModal" class="modal-overlay hidden" role="alertdialog">
+  <div class="modal">
+    <div class="feedback-modal-content">
+      <div class="feedback-icon error"><svg><use href="#ic-trash"/></svg></div>
+      <div class="feedback-title">Excluir chamado?</div>
+      <p class="feedback-msg">Esta ação é permanente e não pode ser desfeita. Deseja continuar?</p>
+      <div style="display:flex;gap:10px;">
+        <button id="confirmDeleteCancelBtn" class="btn btn-secondary" style="flex:1;">Cancelar</button>
+        <button id="confirmDeleteOkBtn" class="btn btn-danger-solid" style="flex:1;">Sim, excluir</button>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- ── MODAL CONFIRMAÇÃO EXCLUSÃO ───────────────────────── -->
-  <div id="confirmDeleteModal" class="modal-overlay hidden">
-    <div class="modal">
-      <div class="feedback-modal-content">
-        <div class="feedback-modal-icon" style="background:#fee2e2;">🗑️</div>
-        <div class="feedback-modal-title">Excluir chamado</div>
-        <p class="feedback-modal-msg">Tem certeza que deseja excluir? Esta ação não pode ser desfeita.</p>
-        <div style="display:flex;gap:10px;justify-content:center;">
-          <button id="confirmDeleteCancelBtn" class="btn btn-secondary">Cancelar</button>
-          <button id="confirmDeleteOkBtn" class="btn btn-danger-solid">Sim, excluir</button>
-        </div>
-      </div>
+<div id="adminAlertModal" class="modal-overlay hidden" role="alertdialog">
+  <div class="modal">
+    <div class="feedback-modal-content">
+      <div class="feedback-icon warning"><svg><use href="#ic-alert"/></svg></div>
+      <div class="feedback-title" id="adminAlertTitle">Atenção</div>
+      <p class="feedback-msg" id="adminAlertMessage"></p>
+      <button id="adminAlertCloseBtn" class="btn btn-secondary" style="width:100%;">Fechar</button>
     </div>
   </div>
+</div>
 
-  <!-- ── MODAL ALERTA ──────────────────────────────────────── -->
-  <div id="adminAlertModal" class="modal-overlay hidden">
-    <div class="modal">
-      <div class="feedback-modal-content">
-        <div class="feedback-modal-icon warning">⚠️</div>
-        <div class="feedback-modal-title" id="adminAlertTitle">Erro</div>
-        <p class="feedback-modal-msg" id="adminAlertMessage"></p>
-        <button id="adminAlertCloseBtn" class="btn btn-secondary" style="width:100%">Fechar</button>
-      </div>
+<div id="finalizarModal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="feedback-modal-content">
+      <div class="feedback-icon success"><svg><use href="#ic-check-circle"/></svg></div>
+      <div class="feedback-title">Finalizar Chamado</div>
+      <p class="feedback-msg">Informe o motivo da resolução. O usuário poderá visualizar esta mensagem.</p>
+    </div>
+    <div style="padding:0 24px 8px;">
+      <textarea id="finalizarMotivo" class="form-input form-textarea" rows="3" placeholder="Descreva como o problema foi resolvido…" style="min-height:80px;"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button id="finalizarCancelarBtn" class="btn btn-secondary">Cancelar</button>
+      <button id="finalizarConfirmarBtn" class="btn btn-primary">
+        <svg><use href="#ic-check-circle"/></svg>
+        Finalizar chamado
+      </button>
     </div>
   </div>
+</div>
 
-  <!-- ── MODAL FINALIZAR ───────────────────────────────────── -->
-  <div id="finalizarModal" class="modal-overlay hidden">
-    <div class="modal">
-      <div class="feedback-modal-content">
-        <div class="feedback-modal-icon success">✅</div>
-        <div class="feedback-modal-title">Finalizar chamado</div>
-        <p class="feedback-modal-msg">Informe o motivo da finalização. Ficará visível para o usuário.</p>
-      </div>
-      <div style="padding:0 24px 8px;">
-        <textarea id="finalizarMotivo" class="form-input form-textarea" rows="3" placeholder="Descreva a resolução…" style="min-height:80px;"></textarea>
-      </div>
-      <div class="modal-footer">
-        <button id="finalizarCancelarBtn" class="btn btn-secondary">Cancelar</button>
-        <button id="finalizarConfirmarBtn" class="btn btn-primary">Finalizar chamado</button>
-      </div>
-    </div>
+<div id="globalLoading" class="loading-overlay hidden">
+  <div class="loading-card">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Processando…</p>
   </div>
+</div>
 
-  <!-- ── LOADING ───────────────────────────────────────────── -->
-  <div id="globalLoading" class="loading-overlay hidden">
-    <div class="loading-card">
-      <div class="loading-spinner"></div>
-      <p class="loading-text">Processando…</p>
-    </div>
-  </div>
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
-  <script type="module" src="js/admin.js"></script>
-  <script type="module" src="js/exportar.js"></script>
+<script>
+  document.getElementById('detalheFecharBtnFooter')?.addEventListener('click', () => {
+    document.getElementById('detalheChamadoModal').classList.add('hidden');
+  });
 
-  <script>
-    // Fechar modal footer btn
-    document.getElementById('detalheFecharBtnFooter')?.addEventListener('click', () => {
-      document.getElementById('detalheChamadoModal').classList.add('hidden');
+  function updateStats() {
+    const cards = document.querySelectorAll('.ticket-card');
+    let espera = 0, atend = 0, resolvido = 0, urgente = 0;
+    cards.forEach(c => {
+      const s = c.dataset.status || '';
+      const u = c.dataset.urgency || '';
+      if (s === 'em-espera') espera++;
+      else if (s === 'em-atendimento') atend++;
+      else if (s === 'resolvido') resolvido++;
+      if (u === 'vermelho' || u === 'laranja') urgente++;
     });
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    set('statEspera', espera);
+    set('statAtendimento', atend);
+    set('statResolvido', resolvido);
+    set('statUrgente', urgente);
+  }
 
-    // Update stats from chamadosContainer mutations (best-effort)
-    function updateStats() {
-      const cards = document.querySelectorAll('.ticket-card');
-      const counts = { espera: 0, atendimento: 0, resolvido: 0, urgente: 0 };
-      cards.forEach(c => {
-        const status = c.dataset.status || '';
-        const urgency = c.dataset.urgency || '';
-        if (status === 'em-espera') counts.espera++;
-        else if (status === 'em-atendimento') counts.atendimento++;
-        else if (status === 'resolvido') counts.resolvido++;
-        if (urgency === 'vermelho' || urgency === 'laranja') counts.urgente++;
-      });
-      const s = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
-      s('statEspera', counts.espera);
-      s('statAtendimento', counts.atendimento);
-      s('statResolvido', counts.resolvido);
-      s('statUrgente', counts.urgente);
-    }
+  const obs = new MutationObserver(updateStats);
+  const cont = document.getElementById('chamadosContainer');
+  if (cont) obs.observe(cont, { childList: true, subtree: true });
 
-    // Observe the cards container
-    const obs = new MutationObserver(updateStats);
-    const container = document.getElementById('chamadosContainer');
-    if (container) obs.observe(container, { childList: true, subtree: true });
-  </script>
+  function showToast(msg, type = 'success') {
+    const icons = { success: '#ic-check-circle', error: '#ic-alert', warning: '#ic-alert' };
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast' + (type !== 'success' ? ' toast-' + type : '');
+    t.innerHTML = `<svg><use href="${icons[type]}"/></svg><span class="toast-text">${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(() => { t.classList.add('exiting'); setTimeout(() => t.remove(), 280); }, 3500);
+  }
+</script>
+<script type="module" src="js/admin.js"></script>
+<script type="module" src="js/exportar.js"></script>
 </body>
 </html>

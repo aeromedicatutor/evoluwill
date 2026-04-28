@@ -1,196 +1,251 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <title>EVOLUWILL — Acompanhar Chamado</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="icon" href="img/Ellipse 1.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="icon" href="img/Ellipse 1.png" type="image/png"/>
 </head>
-
 <body class="page-light">
 
-  <!-- ── HEADER ───────────────────────────────────────────── -->
-  <header class="app-header">
-    <div class="app-header-inner">
-      <div class="logo-nome">
-        <div class="logo-mark">EW</div>
-        <span class="logo-text">EVOLUWILL</span>
-      </div>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="ic-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+  <symbol id="ic-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="ic-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="ic-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="ic-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+  <symbol id="ic-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+  <symbol id="ic-message" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="ic-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+  <symbol id="ic-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></symbol>
+  <symbol id="ic-chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></symbol>
+  <symbol id="ic-ticket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></symbol>
+  <symbol id="ic-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="ic-ban" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></symbol>
+  <symbol id="ic-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+  <symbol id="ic-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></symbol>
+</svg>
 
-      <div class="header-ecg" aria-hidden="true">
-        <svg viewBox="0 0 520 60" role="presentation" focusable="false">
-          <path class="ecg-path" style="opacity:0.25" d="M0 30 L520 30" />
-          <g class="ecg-move">
-            <path class="ecg-path" d="M0 30 L55 30 L70 30 L82 10 L94 50 L108 22 L120 30 L160 30 L175 30 L187 18 L198 42 L212 30 L260 30 L315 30 L330 30 L342 10 L354 50 L368 22 L380 30 L520 30" />
-            <path class="ecg-path" d="M520 30 L575 30 L590 30 L602 10 L614 50 L628 22 L640 30 L680 30 L695 30 L707 18 L718 42 L732 30 L780 30 L835 30 L850 30 L862 10 L874 50 L888 22 L900 30 L1040 30" />
-          </g>
-        </svg>
-      </div>
-
-      <nav class="top-nav">
-        <a href="index.html" class="nav-link">Abrir Chamado</a>
-        <a href="acompanhamento.html" class="nav-link active">Acompanhar</a>
-      </nav>
+<!-- ── HEADER ─────────────────────────────── -->
+<header class="app-header">
+  <div class="app-header-inner">
+    <div class="logo-nome">
+      <div class="logo-mark"><svg><use href="#ic-pulse"/></svg></div>
+      <span class="logo-text">EVOLUWILL</span>
     </div>
-  </header>
+    <div class="header-ecg" aria-hidden="true">
+      <svg viewBox="0 0 520 60" role="presentation" focusable="false">
+        <path class="ecg-track" d="M0 30 L520 30"/>
+        <g class="ecg-move">
+          <path class="ecg-path" d="M0 30 L55 30 L70 30 L82 10 L94 50 L108 22 L120 30 L160 30 L175 30 L187 18 L198 42 L212 30 L260 30 L315 30 L330 30 L342 10 L354 50 L368 22 L380 30 L520 30"/>
+          <path class="ecg-path" d="M520 30 L575 30 L590 30 L602 10 L614 50 L628 22 L640 30 L680 30 L695 30 L707 18 L718 42 L732 30 L780 30 L835 30 L850 30 L862 10 L874 50 L888 22 L900 30 L1040 30"/>
+        </g>
+      </svg>
+    </div>
+    <nav class="top-nav">
+      <a href="index.html" class="nav-link">Abrir Chamado</a>
+      <a href="acompanhamento.html" class="nav-link active">Acompanhar</a>
+    </nav>
+  </div>
+</header>
 
-  <!-- ── MAIN ─────────────────────────────────────────────── -->
-  <main class="main-container">
+<!-- ── MAIN ─────────────────────────────────── -->
+<main class="main-container">
 
-    <!-- Search Card -->
-    <div class="card search-card">
-      <div class="search-card-header">
-        <div class="search-hero-icon">🔎</div>
-        <div class="search-hero-title">Acompanhe seu Chamado</div>
-        <div class="search-hero-sub">Busque pelo número do protocolo ou pelo seu nome para ver o status.</div>
+  <!-- Search hero -->
+  <div class="card search-hero animate-in">
+    <div class="search-hero-inner">
+      <div class="search-hero-emblem">
+        <svg><use href="#ic-search"/></svg>
       </div>
-      <div class="search-body">
-        <div class="search-row">
-          <div class="form-field" style="flex:1">
-            <label class="form-label" for="protocoloInput">Protocolo</label>
-            <input
-              type="text"
-              id="protocoloInput"
-              class="form-input"
-              placeholder="Ex: CH-2025-0001"
-            />
+      <div class="search-hero-title">Acompanhe seu Chamado</div>
+      <div class="search-hero-sub">Informe o número do protocolo ou seu nome para consultar o status e mensagens do atendimento.</div>
+    </div>
+
+    <div class="card-body" style="padding-top:0;">
+      <div class="search-row">
+        <div class="form-field" style="flex:1;">
+          <label class="form-label" for="protocoloInput">
+            <svg style="width:13px;height:13px;color:var(--slate-400)"><use href="#ic-ticket"/></svg>
+            Número do protocolo
+          </label>
+          <input type="text" id="protocoloInput" class="form-input"
+            placeholder="Ex: CH-2025-0001"
+            autocomplete="off" autocapitalize="characters"/>
+        </div>
+        <div class="search-divider">ou</div>
+        <div class="form-field" style="flex:1;">
+          <label class="form-label" for="nomeInput">
+            <svg style="width:13px;height:13px;color:var(--slate-400)"><use href="#ic-user"/></svg>
+            Nome do solicitante
+          </label>
+          <input type="text" id="nomeInput" class="form-input" placeholder="Seu nome completo" autocomplete="name"/>
+        </div>
+        <div style="padding-top:22px; flex-shrink:0;">
+          <button id="buscarChamadoBtn" class="btn btn-primary btn-lg">
+            <svg><use href="#ic-search"/></svg>
+            Buscar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resultados -->
+  <div id="acompanhamentoResultado" style="max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:10px;"></div>
+
+</main>
+
+<!-- ── MODAL DETALHES ──────────────────────── -->
+<div id="acompanharModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+  <div class="modal modal-large">
+
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <span class="protocol-pill" id="acompModalProtocolo">CH-0000</span>
+        <span id="acompUrgenciaBadge" class="urgency-pill"></span>
+      </div>
+      <button class="modal-close-btn" id="acompanharFecharBtn" aria-label="Fechar">
+        <svg><use href="#ic-x"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Status banner -->
+      <div style="display:grid;grid-template-columns:repeat(2,1fr) repeat(2,auto);gap:16px;align-items:start;padding:14px 16px;border-radius:var(--r-lg);background:var(--bg-subtle);border:1px solid var(--color-border);">
+        <div class="field-row">
+          <span class="field-label">Status</span>
+          <span id="acompanharStatus" class="status-pill status-em-espera">Em Espera</span>
+        </div>
+        <div class="field-row">
+          <span class="field-label">Urgência</span>
+          <span id="acompanharUrgencia" class="urgency-pill urgency-verde">—</span>
+        </div>
+        <div class="field-row">
+          <span class="field-label">Aberto em</span>
+          <span class="field-value" id="acompanharDataAbertura">—</span>
+        </div>
+        <div class="field-row">
+          <span class="field-label">Tempo em aberto</span>
+          <span class="field-value" id="acompanharTempoAbertura">—</span>
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="modal-section">
+        <div class="modal-section-title">Informações do Chamado</div>
+        <div class="modal-grid">
+          <div class="field-row">
+            <span class="field-label">Solicitante</span>
+            <span class="field-value" id="acompanharNome">—</span>
           </div>
-          <div class="search-divider">ou</div>
-          <div class="form-field" style="flex:1">
-            <label class="form-label" for="nomeInput">Nome do solicitante</label>
-            <input
-              type="text"
-              id="nomeInput"
-              class="form-input"
-              placeholder="Seu nome completo"
-            />
+          <div class="field-row">
+            <span class="field-label">Categoria</span>
+            <span class="field-value" id="acompanharCategoria">—</span>
           </div>
-          <div style="padding-top:22px;">
-            <button id="buscarChamadoBtn" class="btn btn-primary" style="white-space:nowrap;">
-              🔍 Buscar
+          <div class="field-row" style="grid-column:1/-1;">
+            <span class="field-label">Assunto</span>
+            <span class="field-value" id="acompanharAssunto">—</span>
+          </div>
+          <div class="field-row" style="grid-column:1/-1;">
+            <span class="field-label">Descrição</span>
+            <div class="field-value multiline" id="acompanharDescricao">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Anexo -->
+      <div class="field-row">
+        <span class="field-label">Anexo</span>
+        <div id="acompanharAnexoContainer" class="attachment-box">
+          <svg><use href="#ic-file"/></svg>
+          <span>Sem anexo</span>
+        </div>
+      </div>
+
+      <!-- Chat -->
+      <div class="modal-section">
+        <div class="comments-section">
+          <div class="comments-title">
+            <svg><use href="#ic-message"/></svg>
+            Mensagens com o atendimento
+          </div>
+          <div id="userCommentsList" class="comments-list">
+            <div class="comments-empty">Nenhuma mensagem ainda.</div>
+          </div>
+          <div class="comments-input-row">
+            <textarea id="userNewComment" placeholder="Escreva uma mensagem para o atendimento…" rows="2"></textarea>
+            <button id="userSendCommentBtn" class="btn btn-primary btn-sm">
+              <svg><use href="#ic-send"/></svg>
             </button>
           </div>
         </div>
       </div>
+
     </div>
 
-    <!-- Results -->
-    <div id="acompanhamentoResultado" class="cards-grid" style="max-width:860px;margin:0 auto;"></div>
-
-  </main>
-
-  <!-- ── MODAL DETALHES (read-only) ───────────────────────── -->
-  <div id="acompanharModal" class="modal-overlay hidden">
-    <div class="modal modal-large">
-
-      <div class="modal-header">
-        <div class="modal-header-left">
-          <span class="protocol-pill" id="acompModalProtocolo">CH-0000</span>
-          <span id="acompUrgenciaBadge" class="urgency-pill" style="margin-left:4px;"></span>
-        </div>
-        <button class="modal-close-btn" id="acompanharFecharBtn">✕</button>
+    <div class="modal-footer">
+      <div class="modal-footer-left">
+        <button id="cancelarChamadoBtn" class="btn btn-danger btn-sm">
+          <svg><use href="#ic-ban"/></svg>
+          Cancelar chamado
+        </button>
       </div>
-
-      <div class="modal-body">
-
-        <!-- Status banner -->
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:14px 16px;border-radius:var(--r-lg);background:var(--gray-50);border:1px solid var(--gray-200);">
-          <div>
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-500);margin-bottom:4px;">Status</div>
-            <span id="acompanharStatus" class="status-pill status-em-espera">Em Espera</span>
-          </div>
-          <div>
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-500);margin-bottom:4px;">Urgência</div>
-            <span id="acompanharUrgencia" class="urgency-pill">—</span>
-          </div>
-          <div>
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-500);margin-bottom:4px;">Aberto em</div>
-            <span class="field-value" id="acompanharDataAbertura">—</span>
-          </div>
-          <div>
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-500);margin-bottom:4px;">Tempo em aberto</div>
-            <span class="field-value" id="acompanharTempoAbertura">—</span>
-          </div>
-        </div>
-
-        <!-- Info grid -->
-        <div class="modal-section">
-          <div class="modal-section-title">Informações</div>
-          <div class="modal-grid">
-            <div class="field-row">
-              <span class="field-label">Nome</span>
-              <span class="field-value" id="acompanharNome">—</span>
-            </div>
-            <div class="field-row">
-              <span class="field-label">Categoria</span>
-              <span class="field-value" id="acompanharCategoria">—</span>
-            </div>
-            <div class="field-row" style="grid-column:1/-1;">
-              <span class="field-label">Assunto</span>
-              <span class="field-value" id="acompanharAssunto">—</span>
-            </div>
-            <div class="field-row" style="grid-column:1/-1;">
-              <span class="field-label">Descrição</span>
-              <div class="field-value multiline" id="acompanharDescricao">—</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Anexo -->
-        <div class="field-row">
-          <span class="field-label">Anexo</span>
-          <div id="acompanharAnexoContainer" class="attachment-box">—</div>
-        </div>
-
-        <!-- Chat -->
-        <div class="modal-section">
-          <div class="comments-section">
-            <div class="comments-title">💬 Mensagens com o atendimento</div>
-            <div id="userCommentsList" class="comments-list"></div>
-            <div class="comments-input-row">
-              <textarea id="userNewComment" placeholder="Escreva uma mensagem para o atendimento…" rows="2"></textarea>
-              <button id="userSendCommentBtn" class="btn btn-primary btn-sm">Enviar</button>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="modal-footer">
-        <div class="modal-footer-left">
-          <button id="cancelarChamadoBtn" class="btn btn-danger btn-sm">✖ Cancelar chamado</button>
-        </div>
-        <button id="acompanharFecharBtnFooter" class="btn btn-secondary btn-sm">Fechar</button>
-      </div>
+      <button id="acompanharFecharBtnFooter" class="btn btn-secondary btn-sm">Fechar</button>
     </div>
   </div>
+</div>
 
-  <!-- ── MODAL ALERTA ──────────────────────────────────────── -->
-  <div id="acompAlertModal" class="modal-overlay hidden">
-    <div class="modal">
-      <div class="feedback-modal-content">
-        <div class="feedback-modal-icon warning">ℹ️</div>
-        <div class="feedback-modal-title" id="acompAlertTitle">Mensagem</div>
-        <p class="feedback-modal-msg" id="acompAlertMessage"></p>
-        <button id="acompAlertCloseBtn" class="btn btn-secondary" style="width:100%">Fechar</button>
-      </div>
+<!-- ── MODAL ALERTA ────────────────────────── -->
+<div id="acompAlertModal" class="modal-overlay hidden" role="alertdialog">
+  <div class="modal">
+    <div class="feedback-modal-content">
+      <div class="feedback-icon warning"><svg><use href="#ic-info"/></svg></div>
+      <div class="feedback-title" id="acompAlertTitle">Mensagem</div>
+      <p class="feedback-msg" id="acompAlertMessage"></p>
+      <button id="acompAlertCloseBtn" class="btn btn-secondary" style="width:100%">Fechar</button>
     </div>
   </div>
+</div>
 
-  <!-- ── LOADING ───────────────────────────────────────────── -->
-  <div id="globalLoading" class="loading-overlay hidden">
-    <div class="loading-card">
-      <div class="loading-spinner"></div>
-      <p class="loading-text">Buscando chamado…</p>
-    </div>
+<!-- ── LOADING ─────────────────────────────── -->
+<div id="globalLoading" class="loading-overlay hidden">
+  <div class="loading-card">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Buscando chamado…</p>
   </div>
+</div>
 
-  <script>
-    document.getElementById('acompanharFecharBtnFooter')?.addEventListener('click', () => {
-      document.getElementById('acompanharModal').classList.add('hidden');
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<script>
+  // Auto-fill protocol from URL param (redirected from success modal)
+  const params = new URLSearchParams(location.search);
+  const proto = params.get('protocolo');
+  if (proto) {
+    const inp = document.getElementById('protocoloInput');
+    if (inp) {
+      inp.value = proto;
+      // Trigger search automatically after JS loads
+      window.addEventListener('evoluwill-ready', () => {
+        document.getElementById('buscarChamadoBtn')?.click();
+      }, { once: true });
+    }
+  }
+
+  document.getElementById('acompanharFecharBtnFooter')?.addEventListener('click', () => {
+    document.getElementById('acompanharModal').classList.add('hidden');
+  });
+
+  // Allow Enter key on inputs to trigger search
+  ['protocoloInput','nomeInput'].forEach(id => {
+    document.getElementById(id)?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('buscarChamadoBtn')?.click();
     });
-  </script>
-  <script type="module" src="js/acompanhamento.js"></script>
+  });
+</script>
+<script type="module" src="js/acompanhamento.js"></script>
 </body>
 </html>

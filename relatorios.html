@@ -1,134 +1,164 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <title>EVOLUWILL — Relatórios</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="icon" href="img/Ellipse 1.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="icon" href="img/Ellipse 1.png" type="image/png"/>
 </head>
-
 <body class="page-light">
 
-  <!-- ── HEADER ───────────────────────────────────────────── -->
-  <header class="app-header">
-    <div class="app-header-inner">
-      <div class="logo-nome">
-        <div class="logo-mark">EW</div>
-        <span class="logo-text">EVOLUWILL</span>
-        <span style="background:rgba(255,255,255,0.15);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;margin-left:4px;letter-spacing:0.06em;">ADMIN</span>
-      </div>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="ic-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+  <symbol id="ic-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="ic-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+  <symbol id="ic-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></symbol>
+  <symbol id="ic-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+  <symbol id="ic-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="ic-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="ic-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+</svg>
 
-      <div class="header-ecg" aria-hidden="true">
-        <svg viewBox="0 0 520 60" role="presentation" focusable="false">
-          <path class="ecg-path" style="opacity:0.25" d="M0 30 L520 30" />
-          <g class="ecg-move">
-            <path class="ecg-path" d="M0 30 L55 30 L70 30 L82 10 L94 50 L108 22 L120 30 L160 30 L175 30 L187 18 L198 42 L212 30 L260 30 L315 30 L330 30 L342 10 L354 50 L368 22 L380 30 L520 30" />
-            <path class="ecg-path" d="M520 30 L575 30 L590 30 L602 10 L614 50 L628 22 L640 30 L680 30 L695 30 L707 18 L718 42 L732 30 L780 30 L835 30 L850 30 L862 10 L874 50 L888 22 L900 30 L1040 30" />
-          </g>
-        </svg>
-      </div>
-
-      <nav class="top-nav">
-        <a href="admin.html" class="nav-link">Painel ADM</a>
-        <a href="relatorios.html" class="nav-link active">Relatórios</a>
-      </nav>
+<!-- HEADER -->
+<header class="app-header">
+  <div class="app-header-inner">
+    <div class="logo-nome">
+      <div class="logo-mark"><svg><use href="#ic-pulse"/></svg></div>
+      <span class="logo-text">EVOLUWILL</span>
+      <span class="admin-badge">Admin</span>
     </div>
-  </header>
-
-  <!-- ── MAIN ─────────────────────────────────────────────── -->
-  <main class="main-container">
-
-    <div class="page-header">
-      <div>
-        <div class="page-title">Relatórios de Chamados</div>
-        <div class="page-subtitle">Filtre, visualize e exporte os dados de atendimento</div>
-      </div>
-      <button id="gerarCsvBtn" class="btn btn-accent">⬇ Gerar CSV</button>
+    <div class="header-ecg" aria-hidden="true">
+      <svg viewBox="0 0 520 60" role="presentation" focusable="false">
+        <path class="ecg-track" d="M0 30 L520 30"/>
+        <g class="ecg-move">
+          <path class="ecg-path" d="M0 30 L55 30 L70 30 L82 10 L94 50 L108 22 L120 30 L160 30 L175 30 L187 18 L198 42 L212 30 L260 30 L315 30 L330 30 L342 10 L354 50 L368 22 L380 30 L520 30"/>
+          <path class="ecg-path" d="M520 30 L575 30 L590 30 L602 10 L614 50 L628 22 L640 30 L680 30 L695 30 L707 18 L718 42 L732 30 L780 30 L835 30 L850 30 L862 10 L874 50 L888 22 L900 30 L1040 30"/>
+        </g>
+      </svg>
     </div>
+    <nav class="top-nav">
+      <a href="admin.html" class="nav-link">Painel</a>
+      <a href="relatorios.html" class="nav-link active">Relatórios</a>
+    </nav>
+  </div>
+</header>
 
-    <!-- Filters Card -->
-    <div class="card" style="margin-bottom:20px;">
-      <div class="card-header">
-        <div class="card-title">Filtros</div>
-      </div>
-      <div class="card-body">
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;align-items:end;">
-          <div class="form-field">
-            <label class="form-label">Data início</label>
-            <input type="date" id="relDataInicio" class="form-input" />
-          </div>
-          <div class="form-field">
-            <label class="form-label">Data fim</label>
-            <input type="date" id="relDataFim" class="form-input" />
-          </div>
-          <div class="form-field">
-            <label class="form-label">Status</label>
-            <select id="relStatus" class="form-input form-select">
-              <option value="TODOS">Todos</option>
-              <option value="Em Espera">Em Espera</option>
-              <option value="Em atendimento">Em atendimento</option>
-              <option value="Resolvido">Resolvido</option>
-              <option value="Cancelado">Cancelado</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label class="form-label">Nome / Assunto</label>
-            <input type="text" id="relTexto" class="form-input" placeholder="Filtrar por nome ou assunto" />
-          </div>
-          <div style="display:flex;align-items:flex-end;">
-            <button id="aplicarFiltrosBtn" class="btn btn-primary" style="width:100%;">
-              Aplicar filtros
-            </button>
-          </div>
+<main class="main-container">
+
+  <div class="page-header animate-in">
+    <div>
+      <div class="page-title">Relatórios de Chamados</div>
+      <div class="page-subtitle">Filtre, analise e exporte os dados de atendimento</div>
+    </div>
+    <button id="gerarCsvBtn" class="btn btn-accent">
+      <svg><use href="#ic-download"/></svg>
+      Exportar CSV
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="card animate-in animate-in-1" style="margin-bottom:20px;">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="card-icon card-icon-green"><svg><use href="#ic-filter"/></svg></div>
+        <div>
+          <div class="card-title">Filtros</div>
+          <div class="card-subtitle">Defina o intervalo e critérios antes de aplicar</div>
         </div>
       </div>
     </div>
-
-    <!-- Summary pills -->
-    <div class="summary-row" id="resumoRelatorios" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
-      <!-- Filled by JS -->
-    </div>
-
-    <!-- Table Card -->
-    <div class="card">
-      <div class="logs-table-wrapper" style="max-height:520px;">
-        <table class="logs-table">
-          <thead>
-            <tr>
-              <th>Protocolo</th>
-              <th>Data Abertura</th>
-              <th>Status</th>
-              <th>Urgência</th>
-              <th>Nome</th>
-              <th>Assunto</th>
-            </tr>
-          </thead>
-          <tbody id="relTabelaBody">
-            <tr>
-              <td colspan="6" style="text-align:center;color:var(--gray-400);padding:28px;">
-                Aplique os filtros para visualizar os chamados
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-  </main>
-
-  <!-- ── MODAL ALERTA ──────────────────────────────────────── -->
-  <div id="relAlertModal" class="modal-overlay hidden">
-    <div class="modal">
-      <div class="feedback-modal-content">
-        <div class="feedback-modal-icon warning">ℹ️</div>
-        <div class="feedback-modal-title" id="relAlertTitle">Mensagem</div>
-        <p class="feedback-modal-msg" id="relAlertMessage"></p>
-        <button id="relAlertCloseBtn" class="btn btn-secondary" style="width:100%">Fechar</button>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;align-items:end;">
+        <div class="form-field">
+          <label class="form-label" for="relDataInicio">
+            <svg style="width:12px;height:12px;color:var(--slate-400)"><use href="#ic-calendar"/></svg>
+            Data início
+          </label>
+          <input type="date" id="relDataInicio" class="form-input"/>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="relDataFim">
+            <svg style="width:12px;height:12px;color:var(--slate-400)"><use href="#ic-calendar"/></svg>
+            Data fim
+          </label>
+          <input type="date" id="relDataFim" class="form-input"/>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="relStatus">Status</label>
+          <select id="relStatus" class="form-input form-select">
+            <option value="TODOS">Todos os status</option>
+            <option value="Em Espera">Em Espera</option>
+            <option value="Em atendimento">Em atendimento</option>
+            <option value="Resolvido">Resolvido</option>
+            <option value="Cancelado">Cancelado</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="relTexto">
+            <svg style="width:12px;height:12px;color:var(--slate-400)"><use href="#ic-search"/></svg>
+            Nome / Assunto
+          </label>
+          <input type="text" id="relTexto" class="form-input" placeholder="Filtrar por texto…"/>
+        </div>
+        <div style="display:flex;align-items:flex-end;">
+          <button id="aplicarFiltrosBtn" class="btn btn-primary" style="width:100%;">
+            <svg><use href="#ic-filter"/></svg>
+            Aplicar filtros
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
-  <script type="module" src="js/relatorios.js"></script>
+  <!-- Resumo -->
+  <div class="summary-row" id="resumoRelatorios"></div>
+
+  <!-- Tabela -->
+  <div class="card animate-in animate-in-2">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="card-icon card-icon-green"><svg><use href="#ic-chart"/></svg></div>
+        <div class="card-title">Resultados</div>
+      </div>
+    </div>
+    <div class="logs-table-wrapper" style="max-height:520px;border-radius:0 0 var(--r-xl) var(--r-xl);">
+      <table class="logs-table">
+        <thead>
+          <tr>
+            <th>Protocolo</th>
+            <th>Data Abertura</th>
+            <th>Status</th>
+            <th>Urgência</th>
+            <th>Nome</th>
+            <th>Assunto</th>
+          </tr>
+        </thead>
+        <tbody id="relTabelaBody">
+          <tr>
+            <td colspan="6" style="text-align:center;color:var(--slate-400);padding:36px 14px;">
+              Aplique os filtros acima para visualizar os chamados
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- Modal alerta -->
+<div id="relAlertModal" class="modal-overlay hidden" role="alertdialog">
+  <div class="modal">
+    <div class="feedback-modal-content">
+      <div class="feedback-icon warning"><svg><use href="#ic-info"/></svg></div>
+      <div class="feedback-title" id="relAlertTitle">Mensagem</div>
+      <p class="feedback-msg" id="relAlertMessage"></p>
+      <button id="relAlertCloseBtn" class="btn btn-secondary" style="width:100%">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/relatorios.js"></script>
 </body>
 </html>
