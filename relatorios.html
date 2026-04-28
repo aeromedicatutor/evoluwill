@@ -2,91 +2,133 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Relatórios de Chamados - Admin</title>
+  <title>EVOLUWILL — Relatórios</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="icon" href="img/Ellipse 1.png" type="img/icon">
+  <link rel="icon" href="img/Ellipse 1.png" type="image/png" />
 </head>
+
 <body class="page-light">
-<header class="app-header">
-  <div class="app-header-inner">
-    <div class="logo">Evoluwill</div>
-    <nav class="top-nav">
-      <a href="admin.html" class="nav-link">Painel ADM</a>
-      <a href="relatorios.html" class="nav-link active">Relatórios</a>
-    </nav>
+
+  <!-- ── HEADER ───────────────────────────────────────────── -->
+  <header class="app-header">
+    <div class="app-header-inner">
+      <div class="logo-nome">
+        <div class="logo-mark">EW</div>
+        <span class="logo-text">EVOLUWILL</span>
+        <span style="background:rgba(255,255,255,0.15);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;margin-left:4px;letter-spacing:0.06em;">ADMIN</span>
+      </div>
+
+      <div class="header-ecg" aria-hidden="true">
+        <svg viewBox="0 0 520 60" role="presentation" focusable="false">
+          <path class="ecg-path" style="opacity:0.25" d="M0 30 L520 30" />
+          <g class="ecg-move">
+            <path class="ecg-path" d="M0 30 L55 30 L70 30 L82 10 L94 50 L108 22 L120 30 L160 30 L175 30 L187 18 L198 42 L212 30 L260 30 L315 30 L330 30 L342 10 L354 50 L368 22 L380 30 L520 30" />
+            <path class="ecg-path" d="M520 30 L575 30 L590 30 L602 10 L614 50 L628 22 L640 30 L680 30 L695 30 L707 18 L718 42 L732 30 L780 30 L835 30 L850 30 L862 10 L874 50 L888 22 L900 30 L1040 30" />
+          </g>
+        </svg>
+      </div>
+
+      <nav class="top-nav">
+        <a href="admin.html" class="nav-link">Painel ADM</a>
+        <a href="relatorios.html" class="nav-link active">Relatórios</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── MAIN ─────────────────────────────────────────────── -->
+  <main class="main-container">
+
+    <div class="page-header">
+      <div>
+        <div class="page-title">Relatórios de Chamados</div>
+        <div class="page-subtitle">Filtre, visualize e exporte os dados de atendimento</div>
+      </div>
+      <button id="gerarCsvBtn" class="btn btn-accent">⬇ Gerar CSV</button>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-header">
+        <div class="card-title">Filtros</div>
+      </div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;align-items:end;">
+          <div class="form-field">
+            <label class="form-label">Data início</label>
+            <input type="date" id="relDataInicio" class="form-input" />
+          </div>
+          <div class="form-field">
+            <label class="form-label">Data fim</label>
+            <input type="date" id="relDataFim" class="form-input" />
+          </div>
+          <div class="form-field">
+            <label class="form-label">Status</label>
+            <select id="relStatus" class="form-input form-select">
+              <option value="TODOS">Todos</option>
+              <option value="Em Espera">Em Espera</option>
+              <option value="Em atendimento">Em atendimento</option>
+              <option value="Resolvido">Resolvido</option>
+              <option value="Cancelado">Cancelado</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Nome / Assunto</label>
+            <input type="text" id="relTexto" class="form-input" placeholder="Filtrar por nome ou assunto" />
+          </div>
+          <div style="display:flex;align-items:flex-end;">
+            <button id="aplicarFiltrosBtn" class="btn btn-primary" style="width:100%;">
+              Aplicar filtros
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary pills -->
+    <div class="summary-row" id="resumoRelatorios" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+      <!-- Filled by JS -->
+    </div>
+
+    <!-- Table Card -->
+    <div class="card">
+      <div class="logs-table-wrapper" style="max-height:520px;">
+        <table class="logs-table">
+          <thead>
+            <tr>
+              <th>Protocolo</th>
+              <th>Data Abertura</th>
+              <th>Status</th>
+              <th>Urgência</th>
+              <th>Nome</th>
+              <th>Assunto</th>
+            </tr>
+          </thead>
+          <tbody id="relTabelaBody">
+            <tr>
+              <td colspan="6" style="text-align:center;color:var(--gray-400);padding:28px;">
+                Aplique os filtros para visualizar os chamados
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── MODAL ALERTA ──────────────────────────────────────── -->
+  <div id="relAlertModal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="feedback-modal-content">
+        <div class="feedback-modal-icon warning">ℹ️</div>
+        <div class="feedback-modal-title" id="relAlertTitle">Mensagem</div>
+        <p class="feedback-modal-msg" id="relAlertMessage"></p>
+        <button id="relAlertCloseBtn" class="btn btn-secondary" style="width:100%">Fechar</button>
+      </div>
+    </div>
   </div>
-</header>
 
-<main class="main-container">
-  <section class="card">
-    <header class="section-header">
-      <h1>Relatórios de Chamados</h1>
-    </header>
-
-    <div class="filter-bar wrap">
-      <div class="filter-group">
-        <label class="filter-label">Período</label>
-        <input type="date" id="relDataInicio" class="input-pill" />
-        <input type="date" id="relDataFim" class="input-pill" />
-      </div>
-
-      <div class="filter-group">
-        <label class="filter-label">Status</label>
-        <select id="relStatus" class="input-pill">
-          <option value="TODOS">Todos</option>
-          <option value="Em Espera">Em Espera</option>
-          <option value="Em atendimento">Em atendimento</option>
-          <option value="Resolvido">Resolvido</option>
-          <option value="Cancelado">Cancelado</option>
-        </select>
-      </div>
-
-      <div class="filter-group">
-        <label class="filter-label">Nome / Assunto</label>
-        <input type="text" id="relTexto" class="input-pill" placeholder="Filtrar por nome ou assunto" />
-      </div>
-
-      <button id="aplicarFiltrosBtn" class="btn btn-primary btn-medium">Aplicar filtros</button>
-    </div>
-
-    <section class="summary-row" id="resumoRelatorios">
-      <!-- Resumos (totais) preenchidos via JS -->
-    </section>
-
-    <div class="table-wrapper">
-      <table class="logs-table">
-        <thead>
-        <tr>
-          <th>Protocolo</th>
-          <th>Data Abertura</th>
-          <th>Status</th>
-          <th>Nome</th>
-          <th>Assunto</th>
-        </tr>
-        </thead>
-        <tbody id="relTabelaBody">
-        <!-- Linhas via JS -->
-        </tbody>
-      </table>
-    </div>
-
-    <div class="relatorio-actions">
-      <button id="gerarCsvBtn" class="btn btn-secondary">Gerar planilha CSV</button>
-    </div>
-  </section>
-</main>
-
-<!-- Modal simples para mensagens -->
-<div id="relAlertModal" class="modal-overlay hidden">
-  <div class="modal">
-    <div class="modal-icon">ℹ️</div>
-    <h3 id="relAlertTitle">Mensagem</h3>
-    <p id="relAlertMessage"></p>
-    <button id="relAlertCloseBtn" class="btn btn-secondary">Fechar</button>
-  </div>
-</div>
-
-<script type="module" src="js/relatorios.js"></script>
+  <script type="module" src="js/relatorios.js"></script>
 </body>
 </html>

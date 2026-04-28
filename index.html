@@ -1,158 +1,347 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>EVOLUWILL</title>
+  <meta charset="UTF-8" />
+  <title>EVOLUWILL — Abrir Chamado</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=BBH+Bartle&display=swap" rel="stylesheet"> <!-- Certifique-se de que o link está correto -->
-   <link rel="icon" href="img/Ellipse 1.png" type="img/icon">
+  <link rel="icon" href="img/Ellipse 1.png" type="image/png" />
 </head>
 
 <body class="page-light">
-  <!-- Cabeçalho global -->
+
+  <!-- ── HEADER ───────────────────────────────────────────── -->
   <header class="app-header">
     <div class="app-header-inner">
-      <div class="logo-nome-index">EVOLUWILL</div>
-        <!-- ECG decorativo (batimentos) -->
-    <div class="header-ecg" aria-hidden="true">
-      <svg viewBox="0 0 520 60" role="presentation" focusable="false">
-        <path class="ecg-path ecg-track" d="M0 30 L60 30 L80 30 L95 30 L110 30 L125 30 L140 30 L160 30 L180 30 L200 30 L220 30 L240 30 L260 30 L280 30 L300 30 L320 30 L340 30 L360 30 L380 30 L400 30 L420 30 L440 30 L460 30 L520 30" />
-        <g class="ecg-move">
-          <path class="ecg-path" d="M0 30 L55 30 L70 30 L82 10 L94 50 L108 22 L120 30 L160 30 L175 30 L187 18 L198 42 L212 30 L260 30 L315 30 L330 30 L342 10 L354 50 L368 22 L380 30 L520 30" />
-          <path class="ecg-path" d="M520 30 L575 30 L590 30 L602 10 L614 50 L628 22 L640 30 L680 30 L695 30 L707 18 L718 42 L732 30 L780 30 L835 30 L850 30 L862 10 L874 50 L888 22 L900 30 L1040 30" />
-        </g>
-      </svg>
-    </div>
+      <div class="logo-nome-index">
+        <div class="logo-mark">EW</div>
+        <span class="logo-text">EVOLUWILL</span>
+      </div>
+
+      <!-- ECG decorativo -->
+      <div class="header-ecg" aria-hidden="true">
+        <svg viewBox="0 0 520 60" role="presentation" focusable="false">
+          <path class="ecg-path" style="opacity:0.25" d="M0 30 L520 30" />
+          <g class="ecg-move">
+            <path class="ecg-path" d="M0 30 L55 30 L70 30 L82 10 L94 50 L108 22 L120 30 L160 30 L175 30 L187 18 L198 42 L212 30 L260 30 L315 30 L330 30 L342 10 L354 50 L368 22 L380 30 L520 30" />
+            <path class="ecg-path" d="M520 30 L575 30 L590 30 L602 10 L614 50 L628 22 L640 30 L680 30 L695 30 L707 18 L718 42 L732 30 L780 30 L835 30 L850 30 L862 10 L874 50 L888 22 L900 30 L1040 30" />
+          </g>
+        </svg>
+      </div>
+
       <nav class="top-nav">
         <a href="index.html" class="nav-link active">Abrir Chamado</a>
-        <a href="acompanhamento.html" class="nav-link">Acompanhar Chamado</a>
+        <a href="acompanhamento.html" class="nav-link">Acompanhar</a>
       </nav>
     </div>
   </header>
 
+  <!-- ── MAIN ─────────────────────────────────────────────── -->
   <main class="main-container">
-    <section class="hero-section">
-      <div class="hero-text">
-        
-        <p>. Atendimento de 09h as 18h<br>. Em caso de problema nos chamados de remoção, na descrição do problema coloque: <br>   - Número do IRIS ex:(2450) 
-          <br>   - Número do Dedalus ex:(111120).</p>
+
+    <!-- Info Banner -->
+    <div class="info-banner">
+      <div class="info-banner-icon">⏰</div>
+      <div class="info-banner-body">
+        <div class="info-banner-title">Horário de Atendimento: 09h às 18h</div>
+        <p>Para chamados de remoção, informe na descrição: <strong>Número do IRIS</strong> (ex: 2450) e <strong>Número do Dedalus</strong> (ex: 111120).</p>
       </div>
-    </section>
+    </div>
 
-    <section class="card form-card">
-      <h2 class="card-title">Formulário de Chamado</h2>
-
-      <!-- Formulário de criação do chamado -->
-      <form id="chamadoForm" class="form-grid">
-        <div class="form-field">
-          <label for="nome">Nome do solicitante</label>
-          <input type="text" id="nome" name="nome" required />
-        </div>
-
-        <!-- NOVO: Categoria -->
-        <div class="form-field">
-          <label for="categoria">Categoria</label>
-          <select id="categoria" name="categoria" required>
-            <option value="">Selecione</option>
-            <option value="Melhoria Dedalus">Melhoria Dedalus</option>
-            <option value="Melhoria IRIS">Melhoria IRIS</option>
-            <option value="Melhoria Genesys">Melhoria Genesys</option>
-            <option value="Erro de Integração">Erro de Integração</option>
-            <option value="Erro de App Token">Erro de App Token</option>
-            <option value="Erro no Fechamento">Erro no Fechamento</option>
-            <option value="Cadastro Estabelecimento">Cadastro Estabelecimento</option>
-            <option value="Treinamento Fornecedor">Treinamento Fornecedor</option>
-            <option value="Treinamento Solicitante">Treinamento Solicitante</option>
-            <option value="Fornecedor com dificuldade">Fornecedor com dificuldade</option>
-            <option value="Agendamento">Agendamento</option>
-            <option value="Dúvidas">Dúvidas</option>
-          </select>
-        </div>
-
-        <div class="form-field">
-          <label for="assunto">Assunto do chamado</label>
-          <input type="text" id="assunto" name="assunto" required />
-        </div>
-
-        <!-- NOVO: Urgência -->
-        <div class="form-field">
-          <label for="urgencia">Urgência</label>
-          <select id="urgencia" name="urgencia" required>
-            <option value="">Selecione...</option>
-            <option value="Vermelho - MUITO GRAVE">Vermelho - MUITO GRAVE</option>
-            <option value="Laranja - Resolução para hoje Entre 09h as 17h">Laranja - Resolução para hoje Entre 09h as 17h</option>
-            <option value="Amarelo - Até 2 dias">Amarelo - Até 2 dias</option>
-            <option value="Verde - Até 10 dias">Verde - Até 10 dias</option>
-            <option value="Azul - Demanda Agendada">Azul - Demanda Agendada</option>
-          </select>
-        </div>
-        <div class="form-field full-width">
-          <label for="descricao">Descrição do problema</label>
-          <textarea id="descricao" name="descricao" rows="4" required></textarea>
-        </div>
-
-        <!-- Estrategia de anexo:
-             - Convertemos o arquivo em base64 e salvamos no Firestore.
-             - Isso continua gratuito dentro das cotas padrão do plano free do Firebase.
-             - Para evitar uso exagerado, limitamos o tamanho do arquivo a ~700KB (checado no JS). -->
-        <div class="form-field full-width">
-          <label for="anexo">Anexo (imagem ou PDF - máx. ~700KB)</label>
-          <div class="file-input-wrapper">
-            <input type="file" id="anexo" accept="image/*,.pdf" />
-            <span class="file-label">Selecionar arquivo</span>
-            <span id="anexoNome" class="file-name">Nenhum arquivo selecionado</span>
+    <!-- Form Card -->
+    <div class="card form-card">
+      <div class="card-header">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="form-card-icon">📋</div>
+          <div>
+            <div class="card-title">Formulário de Chamado</div>
+            <div style="font-size:13px;color:var(--color-muted);margin-top:2px;">Preencha todos os campos para registrar seu chamado</div>
           </div>
         </div>
+      </div>
 
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary">
-            Enviar Chamado
-          </button>
-        </div>
+      <div class="card-body">
+        <form id="chamadoForm" class="form-grid">
 
-        <p class="small muted">
-          Ao enviar você concorda com o tratamento dos dados para fins de atendimento.
-        </p>
-      </form>
-    </section>
+          <!-- Nome -->
+          <div class="form-field">
+            <label class="form-label" for="nome">
+              Nome do solicitante <span class="required">*</span>
+            </label>
+            <input
+              class="form-input"
+              type="text"
+              id="nome"
+              name="nome"
+              placeholder="Seu nome completo"
+              required
+            />
+          </div>
+
+          <!-- Assunto -->
+          <div class="form-field">
+            <label class="form-label" for="assunto">
+              Assunto do chamado <span class="required">*</span>
+            </label>
+            <input
+              class="form-input"
+              type="text"
+              id="assunto"
+              name="assunto"
+              placeholder="Resumo breve do problema"
+              required
+            />
+          </div>
+
+          <!-- Categoria -->
+          <div class="form-field full-width">
+            <label class="form-label">Categoria <span class="required">*</span></label>
+            <div class="categoria-selector">
+              <label class="cat-option">
+                <input type="radio" name="categoria" value="Melhoria Dedalus" required />
+                <span class="cat-label"><span class="cat-icon">🏥</span>Melhoria Dedalus</span>
+              </label>
+              <label class="cat-option">
+                <input type="radio" name="categoria" value="Melhoria IRIS" />
+                <span class="cat-label"><span class="cat-icon">👁️</span>Melhoria IRIS</span>
+              </label>
+              <label class="cat-option">
+                <input type="radio" name="categoria" value="Melhoria Genesys" />
+                <span class="cat-label"><span class="cat-icon">☎️</span>Melhoria Genesys</span>
+              </label>
+              <label class="cat-option">
+                <input type="radio" name="categoria" value="Erro de Integração" />
+                <span class="cat-label"><span class="cat-icon">🔗</span>Erro de Integração</span>
+              </label>
+              <label class="cat-option">
+                <input type="radio" name="categoria" value="Erro de App Token" />
+                <span class="cat-label"><span class="cat-icon">🔑</span>Erro de App Token</span>
+              </label>
+              <label class="cat-option">
+                <input type="radio" name="categoria" value="Erro no Fechamento" />
+                <span class="cat-label"><span class="cat-icon">🚫</span>Erro no Fechamento</span>
+              </label>
+              <label class="cat-option">
+                <input type="radio" name="categoria" value="Cadastro Estabelecimento" />
+                <span class="cat-label"><span class="cat-icon">🏢</span>Cadastro Estabelecimento</span>
+              </label>
+              <label class="cat-option">
+                <input type="radio" name="categoria" value="Treinamento Fornecedor" />
+                <span class="cat-label"><span class="cat-icon">📚</span>Treinamento Fornecedor</span>
+              </label>
+              <label class="cat-option">
+                <input type="radio" name="categoria" value="Treinamento Solicitante" />
+                <span class="cat-label"><span class="cat-icon">🎓</span>Treinamento Solicitante</span>
+              </label>
+              <label class="cat-option">
+                <input type="radio" name="categoria" value="Fornecedor com dificuldade" />
+                <span class="cat-label"><span class="cat-icon">⚠️</span>Fornecedor c/ dificuldade</span>
+              </label>
+              <label class="cat-option">
+                <input type="radio" name="categoria" value="Agendamento" />
+                <span class="cat-label"><span class="cat-icon">📅</span>Agendamento</span>
+              </label>
+              <label class="cat-option">
+                <input type="radio" name="categoria" value="Dúvidas" />
+                <span class="cat-label"><span class="cat-icon">❓</span>Dúvidas</span>
+              </label>
+            </div>
+            <!-- Hidden select for JS compatibility -->
+            <select id="categoria" name="categoria" style="display:none;" required>
+              <option value="">Selecione</option>
+              <option value="Melhoria Dedalus">Melhoria Dedalus</option>
+              <option value="Melhoria IRIS">Melhoria IRIS</option>
+              <option value="Melhoria Genesys">Melhoria Genesys</option>
+              <option value="Erro de Integração">Erro de Integração</option>
+              <option value="Erro de App Token">Erro de App Token</option>
+              <option value="Erro no Fechamento">Erro no Fechamento</option>
+              <option value="Cadastro Estabelecimento">Cadastro Estabelecimento</option>
+              <option value="Treinamento Fornecedor">Treinamento Fornecedor</option>
+              <option value="Treinamento Solicitante">Treinamento Solicitante</option>
+              <option value="Fornecedor com dificuldade">Fornecedor com dificuldade</option>
+              <option value="Agendamento">Agendamento</option>
+              <option value="Dúvidas">Dúvidas</option>
+            </select>
+          </div>
+
+          <!-- Urgência -->
+          <div class="form-field full-width">
+            <label class="form-label">Urgência <span class="required">*</span></label>
+            <div class="urgency-selector">
+              <label class="urgency-option">
+                <input type="radio" name="urgencia" value="Vermelho - MUITO GRAVE" required />
+                <span class="urgency-label">
+                  <span class="urgency-dot"></span>
+                  <span>Muito<br>Grave</span>
+                </span>
+              </label>
+              <label class="urgency-option">
+                <input type="radio" name="urgencia" value="Laranja - Resolução para hoje Entre 09h as 17h" />
+                <span class="urgency-label">
+                  <span class="urgency-dot"></span>
+                  <span>Hoje até<br>17h</span>
+                </span>
+              </label>
+              <label class="urgency-option">
+                <input type="radio" name="urgencia" value="Amarelo - Até 2 dias" />
+                <span class="urgency-label">
+                  <span class="urgency-dot"></span>
+                  <span>Até<br>2 dias</span>
+                </span>
+              </label>
+              <label class="urgency-option">
+                <input type="radio" name="urgencia" value="Verde - Até 10 dias" />
+                <span class="urgency-label">
+                  <span class="urgency-dot"></span>
+                  <span>Até<br>10 dias</span>
+                </span>
+              </label>
+              <label class="urgency-option">
+                <input type="radio" name="urgencia" value="Azul - Demanda Agendada" />
+                <span class="urgency-label">
+                  <span class="urgency-dot"></span>
+                  <span>Agendado</span>
+                </span>
+              </label>
+            </div>
+            <!-- Hidden select for JS compatibility -->
+            <select id="urgencia" name="urgencia" style="display:none;" required>
+              <option value="">Selecione...</option>
+              <option value="Vermelho - MUITO GRAVE">Vermelho - MUITO GRAVE</option>
+              <option value="Laranja - Resolução para hoje Entre 09h as 17h">Laranja - Resolução para hoje Entre 09h as 17h</option>
+              <option value="Amarelo - Até 2 dias">Amarelo - Até 2 dias</option>
+              <option value="Verde - Até 10 dias">Verde - Até 10 dias</option>
+              <option value="Azul - Demanda Agendada">Azul - Demanda Agendada</option>
+            </select>
+          </div>
+
+          <!-- Descrição -->
+          <div class="form-field full-width">
+            <label class="form-label" for="descricao">
+              Descrição do problema <span class="required">*</span>
+            </label>
+            <textarea
+              class="form-input form-textarea"
+              id="descricao"
+              name="descricao"
+              rows="5"
+              placeholder="Descreva o problema com detalhes. Para chamados de remoção, informe o número do IRIS e Dedalus."
+              required
+            ></textarea>
+          </div>
+
+          <!-- Anexo -->
+          <div class="form-field full-width">
+            <label class="form-label">Anexo</label>
+            <div class="file-drop-zone" id="fileDropZone">
+              <input type="file" id="anexo" accept="image/*,.pdf" />
+              <span class="file-drop-icon">📎</span>
+              <div class="file-drop-text">Clique ou arraste um arquivo aqui</div>
+              <div class="file-drop-hint">Imagem ou PDF — máximo 700KB</div>
+            </div>
+            <div class="file-selected-preview" id="filePreview">
+              <span class="file-preview-icon">📄</span>
+              <span class="file-preview-name" id="anexoNome">—</span>
+              <button type="button" class="file-preview-remove" id="removeFileBtn">✕</button>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <p class="form-note">Ao enviar, você concorda com o tratamento dos dados para fins de atendimento.</p>
+            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+              <span>📨</span> Enviar Chamado
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
   </main>
 
-  <!-- Modal de feedback (sucesso/erro) -->
+  <!-- ── MODAL SUCESSO ─────────────────────────────────────── -->
   <div id="feedbackModal" class="modal-overlay hidden">
     <div class="modal">
-      <div class="modal-icon" id="feedbackIcon">✔️</div>
-      <h3 id="feedbackTitle">Chamado enviado com sucesso!</h3>
-      <p id="feedbackMessage">
-        Seu protocolo é <strong id="feedbackProtocolo"></strong>.
-        Guarde este número para acompanhar o chamado.
-      </p>
-      <button id="feedbackCloseBtn" class="btn btn-primary">OK</button>
+      <div class="feedback-modal-content">
+        <div class="feedback-modal-icon success" id="feedbackIcon">✅</div>
+        <div class="feedback-modal-title" id="feedbackTitle">Chamado enviado com sucesso!</div>
+        <div class="protocol-box">
+          <div class="protocol-box-label">Seu protocolo</div>
+          <div class="protocol-box-number" id="feedbackProtocolo">—</div>
+        </div>
+        <p class="feedback-modal-msg" id="feedbackMessage">Guarde o número do protocolo para acompanhar o seu chamado.</p>
+        <button id="feedbackCloseBtn" class="btn btn-primary" style="width:100%">OK, entendido</button>
+      </div>
     </div>
   </div>
 
-  <!-- Modal genérico para mostrar erros de validação / limite de arquivo -->
+  <!-- ── MODAL ALERTA ──────────────────────────────────────── -->
   <div id="simpleAlertModal" class="modal-overlay hidden">
     <div class="modal">
-      <div class="modal-icon">⚠️</div>
-      <h3 id="simpleAlertTitle">Atenção</h3>
-      <p id="simpleAlertMessage"></p>
-      <button id="simpleAlertCloseBtn" class="btn btn-secondary">Fechar</button>
+      <div class="feedback-modal-content">
+        <div class="feedback-modal-icon warning">⚠️</div>
+        <div class="feedback-modal-title" id="simpleAlertTitle">Atenção</div>
+        <p class="feedback-modal-msg" id="simpleAlertMessage"></p>
+        <button id="simpleAlertCloseBtn" class="btn btn-secondary" style="width:100%">Fechar</button>
+      </div>
     </div>
   </div>
 
-  <!-- LOADING GLOBAL -->
+  <!-- ── LOADING ───────────────────────────────────────────── -->
   <div id="globalLoading" class="loading-overlay hidden">
-    <div class="loading-backdrop"></div>
-    <div class="loading-content">
+    <div class="loading-card">
       <div class="loading-spinner"></div>
-      <p class="loading-text">Processando seu chamado, por favor aguarde...</p>
+      <p class="loading-text">Enviando seu chamado…</p>
     </div>
   </div>
 
-  <!-- Firebase + lógica -->
+  <script>
+    // Sync visual radio buttons → hidden select
+    document.querySelectorAll('.categoria-selector input[type="radio"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        document.getElementById('categoria').value = radio.value;
+      });
+    });
+
+    document.querySelectorAll('.urgency-selector input[type="radio"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        document.getElementById('urgencia').value = radio.value;
+      });
+    });
+
+    // File drop zone
+    const dropZone = document.getElementById('fileDropZone');
+    const fileInput = document.getElementById('anexo');
+    const preview   = document.getElementById('filePreview');
+    const previewName = document.getElementById('anexoNome');
+    const removeBtn = document.getElementById('removeFileBtn');
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files[0]) {
+        previewName.textContent = fileInput.files[0].name;
+        preview.classList.add('visible');
+        dropZone.style.display = 'none';
+      }
+    });
+
+    removeBtn.addEventListener('click', () => {
+      fileInput.value = '';
+      preview.classList.remove('visible');
+      dropZone.style.display = '';
+    });
+
+    ['dragover','dragleave','drop'].forEach(evt => {
+      dropZone.addEventListener(evt, e => {
+        e.preventDefault();
+        if (evt === 'dragover') dropZone.classList.add('drag-over');
+        else dropZone.classList.remove('drag-over');
+        if (evt === 'drop' && e.dataTransfer.files[0]) {
+          fileInput.files = e.dataTransfer.files;
+          fileInput.dispatchEvent(new Event('change'));
+        }
+      });
+    });
+  </script>
   <script type="module" src="js/index.js"></script>
 </body>
 </html>

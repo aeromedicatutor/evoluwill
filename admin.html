@@ -1,155 +1,224 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Evoluwill</title>
+  <meta charset="UTF-8" />
+  <title>EVOLUWILL — Painel Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=BBH+Bartle&display=swap" rel="stylesheet"> <!-- Certifique-se de que o link está correto -->
-  <link rel="icon" href="img/Ellipse 1.png" type="img/icon">
+  <link rel="icon" href="img/Ellipse 1.png" type="image/png" />
 </head>
+
 <body class="page-light">
+
+  <!-- ── HEADER ───────────────────────────────────────────── -->
   <header class="app-header">
     <div class="app-header-inner">
-      <div class="logo">
-          <div class="logo-nome"><h1>Evoluwill</h1></div>
+      <div class="logo-nome">
+        <div class="logo-mark">EW</div>
+        <span class="logo-text">EVOLUWILL</span>
+        <span style="background:rgba(255,255,255,0.15);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;margin-left:4px;letter-spacing:0.06em;">ADMIN</span>
       </div>
-       <!-- ECG decorativo (batimentos) -->
-    <div class="header-ecg" aria-hidden="true">
-      <svg viewBox="0 0 520 60" role="presentation" focusable="false">
-        <path class="ecg-path ecg-track" d="M0 30 L60 30 L80 30 L95 30 L110 30 L125 30 L140 30 L160 30 L180 30 L200 30 L220 30 L240 30 L260 30 L280 30 L300 30 L320 30 L340 30 L360 30 L380 30 L400 30 L420 30 L440 30 L460 30 L520 30" />
-        <g class="ecg-move">
-          <path class="ecg-path" d="M0 30 L55 30 L70 30 L82 10 L94 50 L108 22 L120 30 L160 30 L175 30 L187 18 L198 42 L212 30 L260 30 L315 30 L330 30 L342 10 L354 50 L368 22 L380 30 L520 30" />
-          <path class="ecg-path" d="M520 30 L575 30 L590 30 L602 10 L614 50 L628 22 L640 30 L680 30 L695 30 L707 18 L718 42 L732 30 L780 30 L835 30 L850 30 L862 10 L874 50 L888 22 L900 30 L1040 30" />
-        </g>
-      </svg>
-    </div>
+
+      <!-- ECG -->
+      <div class="header-ecg" aria-hidden="true">
+        <svg viewBox="0 0 520 60" role="presentation" focusable="false">
+          <path class="ecg-path" style="opacity:0.25" d="M0 30 L520 30" />
+          <g class="ecg-move">
+            <path class="ecg-path" d="M0 30 L55 30 L70 30 L82 10 L94 50 L108 22 L120 30 L160 30 L175 30 L187 18 L198 42 L212 30 L260 30 L315 30 L330 30 L342 10 L354 50 L368 22 L380 30 L520 30" />
+            <path class="ecg-path" d="M520 30 L575 30 L590 30 L602 10 L614 50 L628 22 L640 30 L680 30 L695 30 L707 18 L718 42 L732 30 L780 30 L835 30 L850 30 L862 10 L874 50 L888 22 L900 30 L1040 30" />
+          </g>
+        </svg>
+      </div>
 
       <nav class="top-nav">
         <a href="admin.html" class="nav-link active">Painel ADM</a>
         <a href="relatorios.html" class="nav-link">Relatórios</a>
-        <button id="btnExportar">Exportar Chamados (CSV)</button>
+        <button id="btnExportar" class="nav-btn">⬇ Exportar CSV</button>
       </nav>
     </div>
   </header>
 
-  <main class="main-container admin-layout">
-    <!-- Coluna de Chamados -->
-    <section class="column">
-      <header class="section-header">
-        <h1>PAINEL DE CHAMADOS</h1>
-        <div class="section-actions">
-          <span class="badge" id="totalChamadosBadge">0 chamados</span>
-          <!-- NOVO: contagem por nome filtrado -->
-          <span class="badge" id="contagemNomeBadge" style="display:none;">0 chamados para nome</span>
+  <!-- ── MAIN ─────────────────────────────────────────────── -->
+  <main class="main-container">
+
+    <!-- Stats Row -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-orange">⏳</div>
+        <div class="stat-body">
+          <div class="stat-value" id="statEspera">0</div>
+          <div class="stat-label">Em Espera</div>
         </div>
-      </header>
-
-      <div class="filter-bar">
-        <select id="statusFiltro" class="input-pill">
-          <option value="TODOS">Todos os status</option>
-          <option value="Em Espera">Em Espera</option>
-          <option value="Em atendimento">Em atendimento</option>
-          <option value="Resolvido">Resolvido</option>
-          <option value="Cancelado">Cancelado</option>
-          <!-- NOVO STATUS -->
-          <option value="Verificando com a GTI">Verificando com a GTI</option>
-          <option value="Em Produção">Em Produção</option>
-        </select>
-
-        <!-- NOVO: filtro por nome especificamente -->
-        <input type="text" id="filtroNome" class="input-pill" placeholder="Filtrar por nome" />
-
-        <input type="text" id="buscaTexto" class="input-pill" placeholder="Buscar por nome ou assunto" />
       </div>
-
-      <div id="chamadosContainer" class="cards-grid">
-        <!-- Cards de chamados serão inseridos via JS -->
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-blue">🔵</div>
+        <div class="stat-body">
+          <div class="stat-value" id="statAtendimento">0</div>
+          <div class="stat-label">Em Atendimento</div>
+        </div>
       </div>
-    </section>
-
-    <!-- Coluna de Logs -->
-    <section class="column logs-column">
-      <header class="section-header">
-        <h2>Logs do Sistema</h2>
-      </header>
-
-      <div class="filter-bar">
-        <input type="datetime-local" id="logDataInicio" class="input-pill" />
-        <input type="datetime-local" id="logDataFim" class="input-pill" />
-        <button id="filtrarLogsBtn" class="btn btn-secondary btn-small">Filtrar</button>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-green">✅</div>
+        <div class="stat-body">
+          <div class="stat-value" id="statResolvido">0</div>
+          <div class="stat-label">Resolvidos</div>
+        </div>
       </div>
-
-      <div class="logs-table-wrapper">
-        <table class="logs-table">
-          <thead>
-          <tr>
-            <th>Data/Hora</th>
-            <th>Ação</th>
-            <th>ID Chamado</th>
-            <th>Ator</th>
-            <th>Detalhes</th>
-          </tr>
-          </thead>
-          <tbody id="logsTableBody">
-          <!-- Linhas via JS -->
-          </tbody>
-        </table>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-red">🔴</div>
+        <div class="stat-body">
+          <div class="stat-value" id="statUrgente">0</div>
+          <div class="stat-label">Urgência Alta</div>
+        </div>
       </div>
-    </section>
-  </main>
+    </div>
 
-  <!-- Modal de detalhes do chamado -->
-  <div id="detalheChamadoModal" class="modal-overlay hidden">
-    <div class="modal modal-large">
-      <header class="modal-header">
-        <span class="pill pill-primary" id="modalProtocolo">CH-0000</span>
-        <button class="modal-close-btn" id="detalheFecharBtn">×</button>
-      </header>
+    <!-- Two-column layout -->
+    <div class="admin-layout">
 
-      <div class="modal-body">
-        <div class="modal-grid">
+      <!-- ── LEFT: Chamados ────────────────────────────────── -->
+      <section>
+        <!-- Toolbar -->
+        <div class="section-header">
           <div>
-            <div class="field-row">
-              <span class="field-label">Data de abertura</span>
-              <span class="field-value" id="modalDataAbertura"></span>
-            </div>
-            <div class="field-row">
-              <span class="field-label">Tempo de abertura</span>
-              <span class="field-value" id="modalTempoAbertura"></span>
-            </div>
+            <div class="section-title">Chamados</div>
+          </div>
+          <div class="section-actions">
+            <span class="badge badge-green" id="totalChamadosBadge">0 chamados</span>
+            <span class="badge badge-gray" id="contagemNomeBadge" style="display:none;"></span>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="toolbar-search">
+            <span class="toolbar-search-icon">🔍</span>
+            <input type="text" id="buscaTexto" placeholder="Buscar por nome ou assunto…" />
+          </div>
+          <input type="text" id="filtroNome" class="input-pill" style="min-width:160px;" placeholder="Filtrar por nome" />
+          <select id="statusFiltro" class="filter-select">
+            <option value="TODOS">Todos os status</option>
+            <option value="Em Espera">Em Espera</option>
+            <option value="Em atendimento">Em atendimento</option>
+            <option value="Resolvido">Resolvido</option>
+            <option value="Cancelado">Cancelado</option>
+            <option value="Verificando com a GTI">Verificando c/ GTI</option>
+            <option value="Em Produção">Em Produção</option>
+          </select>
+        </div>
+
+        <div id="chamadosContainer" class="cards-grid">
+          <div class="empty-state">
+            <span class="empty-state-icon">📋</span>
+            <div class="empty-state-title">Carregando chamados…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── RIGHT: Logs ───────────────────────────────────── -->
+      <aside>
+        <div class="card logs-card">
+          <div class="card-header" style="padding-bottom:16px;border-bottom:1px solid var(--color-border);">
+            <div class="card-title">Logs do Sistema</div>
           </div>
 
-          <div>
+          <div class="logs-filter-row">
+            <div>
+              <label>De:</label>
+              <input type="datetime-local" id="logDataInicio" class="datetime-input" />
+            </div>
+            <div>
+              <label>Até:</label>
+              <input type="datetime-local" id="logDataFim" class="datetime-input" />
+            </div>
+            <button id="filtrarLogsBtn" class="btn btn-secondary btn-sm" style="margin-top:4px;">Filtrar</button>
+          </div>
+
+          <div class="logs-table-wrapper">
+            <table class="logs-table">
+              <thead>
+                <tr>
+                  <th>Data/Hora</th>
+                  <th>Ação</th>
+                  <th>ID</th>
+                  <th>Ator</th>
+                </tr>
+              </thead>
+              <tbody id="logsTableBody">
+                <tr>
+                  <td colspan="4" style="text-align:center;color:var(--gray-400);padding:20px;">
+                    Nenhum log registrado
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- ── MODAL DETALHES DO CHAMADO ────────────────────────── -->
+  <div id="detalheChamadoModal" class="modal-overlay hidden">
+    <div class="modal modal-large">
+
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <span class="protocol-pill" id="modalProtocolo">CH-0000</span>
+          <span id="modalUrgenciaBadge" class="urgency-pill" style="margin-left:4px;"></span>
+        </div>
+        <button class="modal-close-btn" id="detalheFecharBtn">✕</button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Status + Info Row -->
+        <div class="modal-section">
+          <div class="modal-section-title">Informações Gerais</div>
+          <div class="modal-grid">
             <div class="field-row">
-              <span class="field-label">Status</span>
-              <select id="modalStatus" class="input-pill">
+              <span class="field-label">Status atual</span>
+              <select id="modalStatus" class="select-inline">
                 <option value="Em Espera">Em Espera</option>
                 <option value="Em atendimento">Em atendimento</option>
                 <option value="Resolvido">Resolvido</option>
                 <option value="Cancelado">Cancelado</option>
-                <!-- NOVO STATUS -->
                 <option value="Verificando com a GTI">Verificando com a GTI</option>
                 <option value="Em Produção">Em Produção</option>
               </select>
             </div>
+            <div class="field-row">
+              <span class="field-label">Urgência</span>
+              <select id="modalUrgencia" class="select-inline">
+                <option value="">Selecione...</option>
+                <option value="Vermelho - MUITO GRAVE">🔴 Vermelho — MUITO GRAVE</option>
+                <option value="Laranja - Resolução para hoje Entre 09h as 17h">🟠 Laranja — Hoje até 17h</option>
+                <option value="Amarelo - Até 2 dias">🟡 Amarelo — Até 2 dias</option>
+                <option value="Verde - Até 10 dias">🟢 Verde — Até 10 dias</option>
+                <option value="Azul - Demanda Agendada">🔵 Azul — Agendado</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Data de abertura</span>
+              <span class="field-value" id="modalDataAbertura">—</span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Tempo em aberto</span>
+              <span class="field-value" id="modalTempoAbertura">—</span>
+            </div>
           </div>
         </div>
 
-        <!-- NOVO GRID: Nome + Categoria (telefone removido) -->
-        <div class="modal-grid">
-          <div>
+        <!-- Solicitante + Dados -->
+        <div class="modal-section">
+          <div class="modal-section-title">Dados do Solicitante</div>
+          <div class="modal-grid">
             <div class="field-row">
-              <span class="field-label">Nome do solicitante</span>
-              <input id="modalNome" class="input-underline" />
+              <span class="field-label">Nome</span>
+              <input id="modalNome" class="input-inline" placeholder="Nome do solicitante" />
             </div>
-          </div>
-          <div>
             <div class="field-row">
               <span class="field-label">Categoria</span>
-              <select id="modalCategoria" class="input-underline">
+              <select id="modalCategoria" class="select-inline">
                 <option value="">Selecione</option>
                 <option value="Melhoria Dedalus">Melhoria Dedalus</option>
                 <option value="Melhoria IRIS">Melhoria IRIS</option>
@@ -163,103 +232,92 @@
                 <option value="Fornecedor com dificuldade">Fornecedor com dificuldade</option>
                 <option value="Agendamento">Agendamento</option>
                 <option value="Dúvidas">Dúvidas</option>
-                </select>
+              </select>
             </div>
           </div>
         </div>
 
-        <!-- NOVO: Urgência (somente aqui, telefone foi removido) -->
-        <div class="field-row">
-          <span class="field-label">Urgência</span>
-          <select id="modalUrgencia" class="input-pill">
-            <option value="">Selecione...</option>
-            <option value="Vermelho - MUITO GRAVE">Vermelho - MUITO GRAVE</option>
-            <option value="Laranja - Resolução para hoje Entre 09h as 17h">
-            Laranja - Resolução para hoje Entre 09h as 17h
-            </option>
-            <option value="Amarelo - Até 2 dias">Amarelo - Até 2 dias</option>
-            <option value="Verde - Até 10 dias">Verde - Até 10 dias</option>
-            <option value="Azul - Demanda Agendada">Azul - Demanda Agendada</option>
-          </select>
+        <!-- Assunto + Descrição -->
+        <div class="modal-section">
+          <div class="modal-section-title">Chamado</div>
+          <div class="field-row" style="margin-bottom:12px;">
+            <span class="field-label">Assunto</span>
+            <input id="modalAssunto" class="input-inline" placeholder="Assunto do chamado" />
+          </div>
+          <div class="field-row">
+            <span class="field-label">Descrição</span>
+            <textarea id="modalDescricao" class="input-inline" rows="4" placeholder="Descrição detalhada…"></textarea>
+          </div>
         </div>
 
-        <div class="field-row">
-          <span class="field-label">Assunto</span>
-          <input id="modalAssunto" class="input-underline" />
-        </div>
-
-        <div class="field-row">
-          <span class="field-label">Descrição</span>
-          <textarea id="modalDescricao" rows="4"></textarea>
-        </div>
-
+        <!-- Anexo -->
         <div class="field-row">
           <span class="field-label">Anexo</span>
-          <div id="modalAnexoContainer" class="attachment-box">
-            <!-- Preenchido via JS -->
+          <div id="modalAnexoContainer" class="attachment-box">—</div>
+        </div>
+
+        <!-- Chat -->
+        <div class="modal-section">
+          <div class="comments-section">
+            <div class="comments-title">💬 Mensagens com o usuário</div>
+            <div id="adminCommentsList" class="comments-list"></div>
+            <div class="comments-input-row">
+              <textarea id="adminNewComment" placeholder="Escreva uma mensagem para o usuário…" rows="2"></textarea>
+              <button id="adminSendCommentBtn" class="btn btn-primary btn-sm">Enviar</button>
+            </div>
           </div>
         </div>
 
-        <!-- CHAT / COMENTÁRIOS (ADM / USUÁRIO) -->
-        <div class="comments-section">
-          <div class="comments-header">
-            <h3 class="comments-title">Mensagens com o usuário</h3>
-          </div>
-          <div id="adminCommentsList" class="comments-list">
-            <!-- Comentários serão carregados via JS -->
-          </div>
-          <div class="comments-input-row">
-            <textarea
-              id="adminNewComment"
-              placeholder="Escreva uma mensagem para o usuário..."
-            ></textarea>
-            <button id="adminSendCommentBtn" class="btn btn-primary btn-small">
-              Enviar
-            </button>
-          </div>
-        </div>
       </div>
 
-      <footer class="modal-footer">
-        <button id="modalExcluirBtn" class="btn btn-danger">Excluir</button>
-        <button id="modalSalvarBtn" class="btn btn-primary">Salvar alterações</button>
-      </footer>
+      <div class="modal-footer">
+        <div class="modal-footer-left">
+          <button id="modalExcluirBtn" class="btn btn-danger btn-sm">🗑 Excluir</button>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="detalheFecharBtnFooter">Cancelar</button>
+        <button id="modalSalvarBtn" class="btn btn-primary">💾 Salvar alterações</button>
+      </div>
     </div>
   </div>
 
-  <!-- Modal de confirmação de exclusão -->
+  <!-- ── MODAL CONFIRMAÇÃO EXCLUSÃO ───────────────────────── -->
   <div id="confirmDeleteModal" class="modal-overlay hidden">
     <div class="modal">
-      <div class="modal-icon">🗑️</div>
-      <h3>Excluir chamado</h3>
-      <p>Tem certeza que deseja excluir este chamado? Esta ação não poderá ser desfeita.</p>
-      <div class="modal-footer">
-        <button id="confirmDeleteCancelBtn" class="btn btn-secondary">Não, cancelar</button>
-        <button id="confirmDeleteOkBtn" class="btn btn-danger">Sim, excluir</button>
+      <div class="feedback-modal-content">
+        <div class="feedback-modal-icon" style="background:#fee2e2;">🗑️</div>
+        <div class="feedback-modal-title">Excluir chamado</div>
+        <p class="feedback-modal-msg">Tem certeza que deseja excluir? Esta ação não pode ser desfeita.</p>
+        <div style="display:flex;gap:10px;justify-content:center;">
+          <button id="confirmDeleteCancelBtn" class="btn btn-secondary">Cancelar</button>
+          <button id="confirmDeleteOkBtn" class="btn btn-danger-solid">Sim, excluir</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Modal de alerta simples -->
+  <!-- ── MODAL ALERTA ──────────────────────────────────────── -->
   <div id="adminAlertModal" class="modal-overlay hidden">
     <div class="modal">
-      <div class="modal-icon">⚠️</div>
-      <h3 id="adminAlertTitle">Erro</h3>
-      <p id="adminAlertMessage"></p>
-      <button id="adminAlertCloseBtn" class="btn btn-secondary">Fechar</button>
+      <div class="feedback-modal-content">
+        <div class="feedback-modal-icon warning">⚠️</div>
+        <div class="feedback-modal-title" id="adminAlertTitle">Erro</div>
+        <p class="feedback-modal-msg" id="adminAlertMessage"></p>
+        <button id="adminAlertCloseBtn" class="btn btn-secondary" style="width:100%">Fechar</button>
+      </div>
     </div>
   </div>
 
-  <!-- Modal para motivo de finalização (já existia, mantido igual) -->
+  <!-- ── MODAL FINALIZAR ───────────────────────────────────── -->
   <div id="finalizarModal" class="modal-overlay hidden">
     <div class="modal">
-      <div class="modal-icon">✅</div>
-      <h3>Finalizar chamado</h3>
-      <p class="small muted">
-        Informe um breve motivo para a finalização. Esse texto será salvo nos comentários do chamado
-        e ficará visível para o usuário na área de acompanhamento.
-      </p>
-      <textarea id="finalizarMotivo" rows="3" style="width:100%; margin-top:0.5rem;"></textarea>
+      <div class="feedback-modal-content">
+        <div class="feedback-modal-icon success">✅</div>
+        <div class="feedback-modal-title">Finalizar chamado</div>
+        <p class="feedback-modal-msg">Informe o motivo da finalização. Ficará visível para o usuário.</p>
+      </div>
+      <div style="padding:0 24px 8px;">
+        <textarea id="finalizarMotivo" class="form-input form-textarea" rows="3" placeholder="Descreva a resolução…" style="min-height:80px;"></textarea>
+      </div>
       <div class="modal-footer">
         <button id="finalizarCancelarBtn" class="btn btn-secondary">Cancelar</button>
         <button id="finalizarConfirmarBtn" class="btn btn-primary">Finalizar chamado</button>
@@ -267,17 +325,46 @@
     </div>
   </div>
 
-  <!-- NOVO: LOADING GLOBAL PARA TODAS AS OPERAÇÕES ASSÍNCRONAS NO ADMIN -->
-  <div id="globalLoading" class="modal-overlay hidden">
-    <div class="modal">
-      <div class="modal-icon">⏳</div>
-      <h3>Processando...</h3>
-      <p class="small muted">Aguarde enquanto aplicamos as alterações.</p>
+  <!-- ── LOADING ───────────────────────────────────────────── -->
+  <div id="globalLoading" class="loading-overlay hidden">
+    <div class="loading-card">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Processando…</p>
     </div>
   </div>
 
   <script type="module" src="js/admin.js"></script>
-  <!-- Carrega o script que faz a exportação -->
-  <script type="module" src="js/exportar.js"></script>s
+  <script type="module" src="js/exportar.js"></script>
+
+  <script>
+    // Fechar modal footer btn
+    document.getElementById('detalheFecharBtnFooter')?.addEventListener('click', () => {
+      document.getElementById('detalheChamadoModal').classList.add('hidden');
+    });
+
+    // Update stats from chamadosContainer mutations (best-effort)
+    function updateStats() {
+      const cards = document.querySelectorAll('.ticket-card');
+      const counts = { espera: 0, atendimento: 0, resolvido: 0, urgente: 0 };
+      cards.forEach(c => {
+        const status = c.dataset.status || '';
+        const urgency = c.dataset.urgency || '';
+        if (status === 'em-espera') counts.espera++;
+        else if (status === 'em-atendimento') counts.atendimento++;
+        else if (status === 'resolvido') counts.resolvido++;
+        if (urgency === 'vermelho' || urgency === 'laranja') counts.urgente++;
+      });
+      const s = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+      s('statEspera', counts.espera);
+      s('statAtendimento', counts.atendimento);
+      s('statResolvido', counts.resolvido);
+      s('statUrgente', counts.urgente);
+    }
+
+    // Observe the cards container
+    const obs = new MutationObserver(updateStats);
+    const container = document.getElementById('chamadosContainer');
+    if (container) obs.observe(container, { childList: true, subtree: true });
+  </script>
 </body>
 </html>

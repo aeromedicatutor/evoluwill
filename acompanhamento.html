@@ -1,179 +1,196 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Acompanhar Evoluwill</title>
+  <meta charset="UTF-8" />
+  <title>EVOLUWILL — Acompanhar Chamado</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=BBH+Bartle&display=swap" rel="stylesheet"> <!-- Certifique-se de que o link está correto -->
-  <link rel="icon" href="img/Ellipse 1.png" type="img/icon">
+  <link rel="icon" href="img/Ellipse 1.png" type="image/png" />
 </head>
 
 <body class="page-light">
-<header class="app-header">
-  <div class="app-header-inner">
-    <div class="logo-nome">Evoluwill</div>
-      <!-- ECG decorativo (batimentos) -->
-    <div class="header-ecg" aria-hidden="true">
-      <svg viewBox="0 0 520 60" role="presentation" focusable="false">
-        <path class="ecg-path ecg-track" d="M0 30 L60 30 L80 30 L95 30 L110 30 L125 30 L140 30 L160 30 L180 30 L200 30 L220 30 L240 30 L260 30 L280 30 L300 30 L320 30 L340 30 L360 30 L380 30 L400 30 L420 30 L440 30 L460 30 L520 30" />
-        <g class="ecg-move">
-          <path class="ecg-path" d="M0 30 L55 30 L70 30 L82 10 L94 50 L108 22 L120 30 L160 30 L175 30 L187 18 L198 42 L212 30 L260 30 L315 30 L330 30 L342 10 L354 50 L368 22 L380 30 L520 30" />
-          <path class="ecg-path" d="M520 30 L575 30 L590 30 L602 10 L614 50 L628 22 L640 30 L680 30 L695 30 L707 18 L718 42 L732 30 L780 30 L835 30 L850 30 L862 10 L874 50 L888 22 L900 30 L1040 30" />
-        </g>
-      </svg>
+
+  <!-- ── HEADER ───────────────────────────────────────────── -->
+  <header class="app-header">
+    <div class="app-header-inner">
+      <div class="logo-nome">
+        <div class="logo-mark">EW</div>
+        <span class="logo-text">EVOLUWILL</span>
+      </div>
+
+      <div class="header-ecg" aria-hidden="true">
+        <svg viewBox="0 0 520 60" role="presentation" focusable="false">
+          <path class="ecg-path" style="opacity:0.25" d="M0 30 L520 30" />
+          <g class="ecg-move">
+            <path class="ecg-path" d="M0 30 L55 30 L70 30 L82 10 L94 50 L108 22 L120 30 L160 30 L175 30 L187 18 L198 42 L212 30 L260 30 L315 30 L330 30 L342 10 L354 50 L368 22 L380 30 L520 30" />
+            <path class="ecg-path" d="M520 30 L575 30 L590 30 L602 10 L614 50 L628 22 L640 30 L680 30 L695 30 L707 18 L718 42 L732 30 L780 30 L835 30 L850 30 L862 10 L874 50 L888 22 L900 30 L1040 30" />
+          </g>
+        </svg>
+      </div>
+
+      <nav class="top-nav">
+        <a href="index.html" class="nav-link">Abrir Chamado</a>
+        <a href="acompanhamento.html" class="nav-link active">Acompanhar</a>
+      </nav>
     </div>
-    <nav class="top-nav">
-      <a href="index.html" class="nav-link">Abrir Chamado</a>
-      <a href="acompanhamento.html" class="nav-link active">Acompanhar Chamado</a>
-    </nav>
+  </header>
+
+  <!-- ── MAIN ─────────────────────────────────────────────── -->
+  <main class="main-container">
+
+    <!-- Search Card -->
+    <div class="card search-card">
+      <div class="search-card-header">
+        <div class="search-hero-icon">🔎</div>
+        <div class="search-hero-title">Acompanhe seu Chamado</div>
+        <div class="search-hero-sub">Busque pelo número do protocolo ou pelo seu nome para ver o status.</div>
+      </div>
+      <div class="search-body">
+        <div class="search-row">
+          <div class="form-field" style="flex:1">
+            <label class="form-label" for="protocoloInput">Protocolo</label>
+            <input
+              type="text"
+              id="protocoloInput"
+              class="form-input"
+              placeholder="Ex: CH-2025-0001"
+            />
+          </div>
+          <div class="search-divider">ou</div>
+          <div class="form-field" style="flex:1">
+            <label class="form-label" for="nomeInput">Nome do solicitante</label>
+            <input
+              type="text"
+              id="nomeInput"
+              class="form-input"
+              placeholder="Seu nome completo"
+            />
+          </div>
+          <div style="padding-top:22px;">
+            <button id="buscarChamadoBtn" class="btn btn-primary" style="white-space:nowrap;">
+              🔍 Buscar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div id="acompanhamentoResultado" class="cards-grid" style="max-width:860px;margin:0 auto;"></div>
+
+  </main>
+
+  <!-- ── MODAL DETALHES (read-only) ───────────────────────── -->
+  <div id="acompanharModal" class="modal-overlay hidden">
+    <div class="modal modal-large">
+
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <span class="protocol-pill" id="acompModalProtocolo">CH-0000</span>
+          <span id="acompUrgenciaBadge" class="urgency-pill" style="margin-left:4px;"></span>
+        </div>
+        <button class="modal-close-btn" id="acompanharFecharBtn">✕</button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Status banner -->
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:14px 16px;border-radius:var(--r-lg);background:var(--gray-50);border:1px solid var(--gray-200);">
+          <div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-500);margin-bottom:4px;">Status</div>
+            <span id="acompanharStatus" class="status-pill status-em-espera">Em Espera</span>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-500);margin-bottom:4px;">Urgência</div>
+            <span id="acompanharUrgencia" class="urgency-pill">—</span>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-500);margin-bottom:4px;">Aberto em</div>
+            <span class="field-value" id="acompanharDataAbertura">—</span>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-500);margin-bottom:4px;">Tempo em aberto</div>
+            <span class="field-value" id="acompanharTempoAbertura">—</span>
+          </div>
+        </div>
+
+        <!-- Info grid -->
+        <div class="modal-section">
+          <div class="modal-section-title">Informações</div>
+          <div class="modal-grid">
+            <div class="field-row">
+              <span class="field-label">Nome</span>
+              <span class="field-value" id="acompanharNome">—</span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Categoria</span>
+              <span class="field-value" id="acompanharCategoria">—</span>
+            </div>
+            <div class="field-row" style="grid-column:1/-1;">
+              <span class="field-label">Assunto</span>
+              <span class="field-value" id="acompanharAssunto">—</span>
+            </div>
+            <div class="field-row" style="grid-column:1/-1;">
+              <span class="field-label">Descrição</span>
+              <div class="field-value multiline" id="acompanharDescricao">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Anexo -->
+        <div class="field-row">
+          <span class="field-label">Anexo</span>
+          <div id="acompanharAnexoContainer" class="attachment-box">—</div>
+        </div>
+
+        <!-- Chat -->
+        <div class="modal-section">
+          <div class="comments-section">
+            <div class="comments-title">💬 Mensagens com o atendimento</div>
+            <div id="userCommentsList" class="comments-list"></div>
+            <div class="comments-input-row">
+              <textarea id="userNewComment" placeholder="Escreva uma mensagem para o atendimento…" rows="2"></textarea>
+              <button id="userSendCommentBtn" class="btn btn-primary btn-sm">Enviar</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <div class="modal-footer-left">
+          <button id="cancelarChamadoBtn" class="btn btn-danger btn-sm">✖ Cancelar chamado</button>
+        </div>
+        <button id="acompanharFecharBtnFooter" class="btn btn-secondary btn-sm">Fechar</button>
+      </div>
+    </div>
   </div>
-</header>
 
-<main class="main-container">
-  <section class="hero-section">
-    <div class="hero-text">
-      <h1>Acompanhe seu chamado</h1>
-      <p>Digite o número do protocolo ou seu nome para ver o status.</p>
-    </div>
-  </section>
-
-  <section class="card">
-    <div class="search-row">
-      <div class="acomp-search-card">
-        <div class="acomp-search-grid">
-          <div class="acomp-field">
-            <label for="protocoloInput">Protocolo:</label>
-            <input type="text" id="protocoloInput" class="input-pill" placeholder="Protocolo (ex: CH-2025-0001)" />
-          </div>
-      <div class="acomp-field">
-            <label for="nomeInput">Nome:</label>
-            <input type="text" id="nomeInput" class="input-pill" placeholder="Ou digite o nome do solicitante" />
-          </div>
-      <button id="buscarChamadoBtn" class="btn btn-primary btn-medium">Buscar</button>
-    </div>
-  
-    <div id="acompanhamentoResultado" class="cards-grid">
-      <!-- Cards dos chamados encontrados serão inseridos aqui -->
-    </div>
-  </section>
-</main>
-
-<!-- Modal de detalhes de acompanhamento (somente leitura) -->
-<div id="acompanharModal" class="modal-overlay hidden">
-  <div class="modal modal-large">
-    <header class="modal-header">
-      <span class="pill pill-primary" id="acompModalProtocolo">CH-0000</span>
-      <button class="modal-close-btn" id="acompanharFecharBtn">×</button>
-    </header>
-
-    <div class="modal-body">
-      <div class="modal-grid">
-        <div>
-          <div class="field-row">
-            <span class="field-label">Data de abertura</span>
-            <span class="field-value" id="acompanharDataAbertura"></span>
-          </div>
-          <div class="field-row">
-            <span class="field-label">Tempo de abertura</span>
-            <span class="field-value" id="acompanharTempoAbertura"></span>
-          </div>
-        </div>
-
-        <div>
-          <div class="field-row">
-            <span class="field-label">Status</span>
-            <span class="field-value">
-              <span id="acompanharStatus" class="status-pill">Em Espera</span>
-            </span>
-          </div>
-          <div class="field-row">
-            <span class="field-label">Urgência</span>
-            <span class="field-value">
-              <span id="acompanharUrgencia" class="urgency-pill">-</span>
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-grid">
-        <div>
-          <div class="field-row">
-            <span class="field-label">Nome do solicitante</span>
-            <span class="field-value" id="acompanharNome"></span>
-          </div>
-        </div>
-        <div>
-          <div class="field-row">
-            <span class="field-label">Categoria</span>
-            <span class="field-value" id="acompanharCategoria"></span>
-          </div>
-        </div>
-      </div>
-
-      <div class="field-row">
-        <span class="field-label">Assunto</span>
-        <span class="field-value" id="acompanharAssunto"></span>
-      </div>
-
-      <div class="field-row">
-        <span class="field-label">Descrição</span>
-        <div class="field-value multiline" id="acompanharDescricao"></div>
-      </div>
-
-      <div class="field-row">
-        <span class="field-label">Anexo</span>
-        <div id="acompanharAnexoContainer" class="attachment-box"></div>
-      </div>
-
-      <!-- CHAT / COMENTÁRIOS (USUÁRIO / ADM) -->
-      <div class="comments-section">
-        <div class="comments-header">
-          <h3 class="comments-title">Mensagens com o atendimento</h3>
-        </div>
-        <div id="userCommentsList" class="comments-list">
-          <!-- Comentários serão carregados via JS -->
-        </div>
-        <div class="comments-input-row">
-          <textarea
-            id="userNewComment"
-            placeholder="Escreva uma mensagem para o atendimento."
-          ></textarea>
-          <button id="userSendCommentBtn" class="btn btn-primary btn-small">
-            Enviar
-          </button>
-        </div>
+  <!-- ── MODAL ALERTA ──────────────────────────────────────── -->
+  <div id="acompAlertModal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="feedback-modal-content">
+        <div class="feedback-modal-icon warning">ℹ️</div>
+        <div class="feedback-modal-title" id="acompAlertTitle">Mensagem</div>
+        <p class="feedback-modal-msg" id="acompAlertMessage"></p>
+        <button id="acompAlertCloseBtn" class="btn btn-secondary" style="width:100%">Fechar</button>
       </div>
     </div>
-
-    <footer class="modal-footer">
-      <!-- Usuário apenas cancela o chamado -->
-      <button id="cancelarChamadoBtn" class="btn btn-danger">Cancelar chamado</button>
-    </footer>
   </div>
-</div>
 
-<!-- Modal simples para mensagens -->
-<div id="acompAlertModal" class="modal-overlay hidden">
-  <div class="modal">
-    <div class="modal-icon">ℹ️</div>
-    <h3 id="acompAlertTitle">Mensagem</h3>
-    <p id="acompAlertMessage"></p>
-    <button id="acompAlertCloseBtn" class="btn btn-secondary">Fechar</button>
+  <!-- ── LOADING ───────────────────────────────────────────── -->
+  <div id="globalLoading" class="loading-overlay hidden">
+    <div class="loading-card">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Buscando chamado…</p>
+    </div>
   </div>
-</div>
 
-<!-- LOADING GLOBAL -->
-<div id="globalLoading" class="loading-overlay hidden">
-  <div class="loading-backdrop"></div>
-  <div class="loading-content">
-    <div class="loading-spinner"></div>
-    <p class="loading-text">Carregando informações do chamado...</p>
-  </div>
-</div>
-
-<script type="module" src="js/acompanhamento.js"></script>
+  <script>
+    document.getElementById('acompanharFecharBtnFooter')?.addEventListener('click', () => {
+      document.getElementById('acompanharModal').classList.add('hidden');
+    });
+  </script>
+  <script type="module" src="js/acompanhamento.js"></script>
 </body>
 </html>
